@@ -1,6 +1,5 @@
-// Import here Polyfills if needed. Recommended core-js (npm i -D core-js)
-  // import "core-js/fn/array.find"
-  // ...
-export default class DummyClass {
+import 'core-js/fn/array/find-index'
+import 'core-js/fn/object/assign'
+import Datepicker from './Datepicker'
 
-}
+export default Datepicker

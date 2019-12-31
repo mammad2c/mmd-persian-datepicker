@@ -3,6 +3,6 @@ import 'core-js/fn/object/assign'
 import Datepicker from './Datepicker'
 
 // styles
-import './assets/scss/mmd-persian-datepicker.scss'
+import './styles/mmd-persian-datepicker.scss'
 
 export default Datepicker

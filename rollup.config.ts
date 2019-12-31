@@ -5,6 +5,9 @@ import camelCase from 'lodash.camelcase'
 import typescript from 'rollup-plugin-typescript2'
 import json from 'rollup-plugin-json'
 import scss from 'rollup-plugin-scss'
+import { uglify } from 'rollup-plugin-uglify'
+
+const isProduction = process.env.NODE_ENV === 'production'
 
 const pkg = require('./package.json')
 
@@ -32,6 +35,7 @@ export default {
 
     // Resolve source maps to the original source
     sourceMaps(),
-    scss()
+    scss(),
+    isProduction && uglify()
   ]
 }

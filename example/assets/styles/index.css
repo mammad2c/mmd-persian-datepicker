@@ -1,0 +1,38 @@
+@font-face {
+  font-family: vazir;
+  src: url('../fonts/Vazir.eot');
+  src: url('../fonts/Vazir.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Vazir.woff2') format('woff2'), url('../fonts/Vazir.woff') format('woff'),
+    url('../fonts/Vazir.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: vazir;
+}
+
+.form-input {
+  border: none;
+  box-shadow: 0 0 5px #ccc;
+  height: 50px;
+  text-align: center;
+  width: 300px;
+  border-radius: 40px;
+  display: block;
+  margin: 5em auto;
+  font-size: 1.5rem;
+  padding: 0.5em;
+  transition: all 0.3s;
+}
+
+.form-input:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgb(31, 85, 202);
+}

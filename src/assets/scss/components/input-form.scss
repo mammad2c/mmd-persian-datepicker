@@ -1,0 +1,58 @@
+.input-group {
+	position: relative;
+	margin-bottom: 15px;
+}
+
+.input-form {
+	display: block;
+	width: 100%;
+	height: 40px;
+	padding: 6px 12px;
+	font-size: 14px;
+	line-height: 1.42857143;
+	color: #555;
+	background-color: #fff;
+	background-image: none;
+	border: 1px solid #ccc;
+	transition: all 0.3s;
+	// border-radius: $radius; custom radius , relay on ui design
+	&:focus,
+	&:active {
+		box-shadow: 0, 0, 3px, 1px, #e2e2e2;
+		background-color: #eeeeee;
+	}
+}
+
+input.have-addon {
+	padding-left: 40px;
+}
+
+select.input-form {
+	height: 36px;
+	padding: 0 10px;
+	font-size: 1.2rem;
+	margin-bottom: 15px;
+}
+
+textarea {
+	max-width: 100%;
+	min-width: 100%;
+	min-height: 168px;
+	text-align: right !important;
+}
+
+select {
+	border: none;
+	outline: none;
+	background-color: #fff;
+}
+
+input + .input-addon {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	vertical-align: middle;
+	padding: 10px;
+	border: none;
+}

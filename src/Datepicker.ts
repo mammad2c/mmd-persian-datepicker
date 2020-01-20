@@ -1,5 +1,3 @@
-import 'core-js/fn/array.find'
-
 import moment, { Moment } from 'moment-jalaali'
 
 // library imports

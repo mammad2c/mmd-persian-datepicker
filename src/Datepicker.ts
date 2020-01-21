@@ -49,7 +49,7 @@ interface IOptions {
   }
   weekName: Array<string>
   monthName: Array<string>
-  onClick?: (self: Datepicker, selectedDate: ISelectedDates) => void
+  onClick?: (selectedDate: ISelectedDates, self: Datepicker) => void
 }
 
 const defaultOptionsValue: IOptions = {
@@ -103,15 +103,29 @@ const defaultOptionsValue: IOptions = {
 
 class Datepicker {
   public getValue: () => ISelectedDates
+  public open: () => void
+  public close: () => void
 
+  /**
+   * Datepicker constructor params:
+   * @param elem the element css selector
+   * @param options Datepicker options
+   */
   constructor(elem: string, options?: IOptions) {
-    const datepicker = new PrivateDatePicker(elem, options)
+    const datepicker = new PrivateDatePicker(elem, this, options)
     this.getValue = datepicker.getValue
+    this.open = datepicker.open
+    this.close = datepicker.close
   }
 }
 
 class PrivateDatePicker {
+  // constructor elements
   private elem: HTMLInputElement | HTMLElement
+  private options: IOptions
+  private pickerPrivater: Datepicker
+
+  // rests
   private elemId: string
   private elemPosition?: IElemPosition
   private calendarElem: HTMLElement
@@ -125,9 +139,8 @@ class PrivateDatePicker {
   private daysInCurrentMonth: number[] = []
   private timeoutTemp?: any
   private isOpen: boolean
-  private options: IOptions
 
-  constructor(elem: string, options?: IOptions) {
+  constructor(elem: string, pickerPrivater: Datepicker, options?: IOptions) {
     this.elemId = elem
     const elemExist = document.querySelector(elem) as HTMLInputElement
 
@@ -138,6 +151,7 @@ class PrivateDatePicker {
     }
 
     this.options = Object.assign(defaultOptionsValue, options)
+    this.pickerPrivater = pickerPrivater
     this.calendarElem = document.createElement('div')
     this.today = moment(new Date())
     this.todayDay = this.today.jDate()
@@ -366,7 +380,7 @@ class PrivateDatePicker {
       }
 
       if (typeof options.onClick === 'function') {
-        this.onClickEvt(this, this.selectedDates)
+        this.onClickEvt(this.selectedDates)
       }
 
       if (options.autoClose) {
@@ -377,14 +391,14 @@ class PrivateDatePicker {
     return body
   }
 
-  private onClickEvt = (self: this, selectedDate: ISelectedDates) => {
+  private onClickEvt = (selectedDate: ISelectedDates) => {
     const { onClick } = this.options
 
     if (!onClick) {
       return
     }
 
-    onClick(self, selectedDate)
+    onClick(selectedDate, this.pickerPrivater)
   }
 
   private getElemPosition = (): void => {
@@ -431,14 +445,14 @@ class PrivateDatePicker {
     return moment(`${date}`, format ? format : this.options.format)
   }
 
-  private open = (): void => {
+  public open = (): void => {
     if (this.isOpen) return
     this.isOpen = true
     this.setPosition()
     this.addOpenClass()
   }
 
-  private close = (): void => {
+  public close = (): void => {
     if (!this.isOpen) return
     this.isOpen = false
     this.removeOpenClass()

@@ -9,6 +9,7 @@ interface ISelectedDateItem {
   timestamp: number
   value: any
 }
+
 interface ISelectedDates extends Array<ISelectedDateItem> {}
 
 interface IElemPosition {
@@ -16,7 +17,100 @@ interface IElemPosition {
   left: number
 }
 
+interface IOptions {
+  autoClose: boolean
+  multiple: boolean
+  multipleSeparator: string
+  timeout: number
+  format: string
+  classNames: {
+    baseClassName: string
+    // headers class name:
+    headerClassName: string
+    arrowsClassName: string
+    arrowsRightClassName: string
+    arrowsLeftClassName: string
+    titleClassName: string
+    titleMonthClassName: string
+    titleYearClassName: string
+    // body class name:
+    bodyClassName: string
+    weeksClassName: string
+    weekItemClassName: string
+    daysClassName: string
+    dayItemClassName: string
+    selectedDayItemClassName: string
+    // footer class name:
+    footerClassName: string
+  }
+  arrows: {
+    left: string
+    right: string
+  }
+  weekName: Array<string>
+  monthName: Array<string>
+  onClick?: (self: Datepicker, selectedDate: ISelectedDates) => void
+}
+
+const defaultOptionsValue: IOptions = {
+  autoClose: false,
+  multiple: false,
+  multipleSeparator: ' - ',
+  timeout: 250,
+  format: 'jYYYY/jM/jD',
+  classNames: {
+    baseClassName: constants.baseClassName,
+    // headers class name:
+    headerClassName: constants.headerClassName,
+    arrowsClassName: constants.arrowsClassName,
+    arrowsRightClassName: constants.arrowsRightClassName,
+    arrowsLeftClassName: constants.arrowsLeftClassName,
+    titleClassName: constants.titleClassName,
+    titleMonthClassName: constants.titleMonthClassName,
+    titleYearClassName: constants.titleYearClassName,
+    // body class name:
+    bodyClassName: constants.bodyClassName,
+    weeksClassName: constants.weeksClassName,
+    weekItemClassName: constants.weekItemClassName,
+    daysClassName: constants.daysClassName,
+    dayItemClassName: constants.dayItemClassName,
+    selectedDayItemClassName: constants.selectedDayItemClassName,
+    // footer class name:
+    footerClassName: constants.footerClassName
+  },
+  arrows: {
+    left:
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.175 477.175"><path d="M145.188 238.575l215.5-215.5c5.3-5.3 5.3-13.8 0-19.1s-13.8-5.3-19.1 0l-225.1 225.1c-5.3 5.3-5.3 13.8 0 19.1l225.1 225c2.6 2.6 6.1 4 9.5 4s6.9-1.3 9.5-4c5.3-5.3 5.3-13.8 0-19.1l-215.4-215.5z"/></svg>',
+    right:
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.175 477.175"><path d="M360.731 229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1 0s-5.3 13.8 0 19.1l215.5 215.5-215.5 215.5c-5.3 5.3-5.3 13.8 0 19.1 2.6 2.6 6.1 4 9.5 4 3.4 0 6.9-1.3 9.5-4l225.1-225.1c5.3-5.2 5.3-13.8.1-19z"/></svg>'
+  },
+  weekName: ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'],
+  monthName: [
+    'فروردین',
+    'اردیبهشت',
+    'خرداد',
+    'تیر',
+    'مرداد',
+    'شهریور',
+    'مهر',
+    'آبان',
+    'آذر',
+    'دی',
+    'بهمن',
+    'اسفند'
+  ]
+}
+
 class Datepicker {
+  public getValue: () => ISelectedDates
+
+  constructor(elem: string, options?: IOptions) {
+    const datepicker = new PrivateDatePicker(elem, options)
+    this.getValue = datepicker.getValue
+  }
+}
+
+class PrivateDatePicker {
   private elem: HTMLInputElement | HTMLElement
   private elemId: string
   private elemPosition?: IElemPosition
@@ -27,77 +121,28 @@ class Datepicker {
   private todayYear: number
   private currentYear: number
   private currentMonth: number
-  private currentDay: number
   private selectedDates: ISelectedDates = []
   private daysInCurrentMonth: number[] = []
   private timeoutTemp?: any
   private isOpen: boolean
+  private options: IOptions
 
-  private options: any = {
-    autoClose: false,
-    multiple: false,
-    multipleSeparator: ' - ',
-    timeout: 250,
-    format: 'jYYYY/jM/jD',
-    classNames: {
-      baseClassName: constants.baseClassName,
-      // headers class name:
-      headerClassName: constants.headerClassName,
-      arrowsClassName: constants.arrowsClassName,
-      arrowsRightClassName: constants.arrowsRightClassName,
-      arrowsLeftClassName: constants.arrowsLeftClassName,
-      titleClassName: constants.titleClassName,
-      titleMonthClassName: constants.titleMonthClassName,
-      titleYearClassName: constants.titleYearClassName,
-      // body class name:
-      bodyClassName: constants.bodyClassName,
-      weeksClassName: constants.weeksClassName,
-      weekItemClassName: constants.weekItemClassName,
-      daysClassName: constants.daysClassName,
-      dayItemClassName: constants.dayItemClassName,
-      selectedDayItemClassName: constants.selectedDayItemClassName,
-      // footer class name:
-      footerClassName: constants.footerClassName
-    },
-    arrows: {
-      left:
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.175 477.175"><path d="M145.188 238.575l215.5-215.5c5.3-5.3 5.3-13.8 0-19.1s-13.8-5.3-19.1 0l-225.1 225.1c-5.3 5.3-5.3 13.8 0 19.1l225.1 225c2.6 2.6 6.1 4 9.5 4s6.9-1.3 9.5-4c5.3-5.3 5.3-13.8 0-19.1l-215.4-215.5z"/></svg>',
-      right:
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.175 477.175"><path d="M360.731 229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1 0s-5.3 13.8 0 19.1l215.5 215.5-215.5 215.5c-5.3 5.3-5.3 13.8 0 19.1 2.6 2.6 6.1 4 9.5 4 3.4 0 6.9-1.3 9.5-4l225.1-225.1c5.3-5.2 5.3-13.8.1-19z"/></svg>'
-    },
-    weekName: ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'],
-    monthName: [
-      'فروردین',
-      'اردیبهشت',
-      'خرداد',
-      'تیر',
-      'مرداد',
-      'شهریور',
-      'مهر',
-      'آبان',
-      'آذر',
-      'دی',
-      'بهمن',
-      'اسفند'
-    ]
-  }
-
-  constructor(elem: string, options?: object) {
+  constructor(elem: string, options?: IOptions) {
     this.elemId = elem
-    const elemExist = document.getElementById(elem) as HTMLInputElement
+    const elemExist = document.querySelector(elem) as HTMLInputElement
+
     if (!elemExist) {
       throw Error(`the ${elem} not found in your dom`)
     } else {
       this.elem = elemExist
     }
-    Object.assign(this.options, options)
+
+    this.options = Object.assign(defaultOptionsValue, options)
     this.calendarElem = document.createElement('div')
     this.today = moment(new Date())
     this.todayDay = this.today.jDate()
     this.todayMonth = this.today.jMonth()
     this.todayYear = this.today.jYear()
-    // console.log(this.today.format("jYYYY/jM/jD"));
-    this.currentDay = this.todayDay
     this.currentMonth = this.todayMonth
     this.currentYear = this.todayYear
     this.createElement()
@@ -333,13 +378,13 @@ class Datepicker {
   }
 
   private onClickEvt = (self: this, selectedDate: ISelectedDates) => {
-    const { multiple, onClick } = this.options
+    const { onClick } = this.options
 
-    if (multiple) {
-      onClick(self, selectedDate)
-    } else {
-      onClick(self, selectedDate[0])
+    if (!onClick) {
+      return
     }
+
+    onClick(self, selectedDate)
   }
 
   private getElemPosition = (): void => {

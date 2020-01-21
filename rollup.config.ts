@@ -1,7 +1,6 @@
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import sourceMaps from 'rollup-plugin-sourcemaps'
-import camelCase from 'lodash.camelcase'
 import typescript from 'rollup-plugin-typescript2'
 import json from 'rollup-plugin-json'
 import scss from 'rollup-plugin-scss'
@@ -18,7 +17,7 @@ export default {
   output: [
     {
       file: pkg.main,
-      name: camelCase(libraryName),
+      name: 'MmdPersianDatepicker',
       format: 'umd',
       sourcemap: true,
       globals: { 'moment-jalaali': 'moment' }

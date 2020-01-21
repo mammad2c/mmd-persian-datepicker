@@ -2,7 +2,16 @@
   "name": "mmd-persian-datepicker",
   "version": "0.1.4",
   "description": "",
-  "keywords": [],
+  "keywords": [
+    "datepicker",
+    "calendar",
+    "persian",
+    "jalali",
+    "farsi",
+    "persian datepicker",
+    "jalali datepicker",
+    "persian calendar"
+  ],
   "main": "dist/mmd-persian-datepicker.umd.js",
   "module": "dist/mmd-persian-datepicker.es5.js",
   "typings": "dist/types/mmd-persian-datepicker.d.ts",
@@ -12,7 +21,7 @@
   "author": "Mohammad Toosi m_dd@rogers.com",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/mammad2c/mmd-persian-datepicker"
   },
   "license": "MIT",
   "engines": {

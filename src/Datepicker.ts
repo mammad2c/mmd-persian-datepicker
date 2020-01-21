@@ -112,14 +112,14 @@ class Datepicker {
    * @param options Datepicker options
    */
   constructor(elem: string, options?: IOptions) {
-    const datepicker = new PrivateDatePicker(elem, this, options)
+    const datepicker = new PrivateDatepicker(elem, this, options)
     this.getValue = datepicker.getValue
     this.open = datepicker.open
     this.close = datepicker.close
   }
 }
 
-class PrivateDatePicker {
+class PrivateDatepicker {
   // constructor elements
   private elem: HTMLInputElement | HTMLElement
   private options: IOptions

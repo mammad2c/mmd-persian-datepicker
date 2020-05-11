@@ -1,6 +1,8 @@
 import Datepicker from './Datepicker'
 
 // styles
-import './styles/mmd-persian-datepicker.scss'
+import './styles/variables.scss'
+import './styles/mixin.scss'
+import './styles/Datepicker.scss'
 
 export default Datepicker

@@ -1,6 +1,6 @@
 .mmd-picker {
   position: absolute;
-  width: $picker-width;
+  width: $pickerWidth;
   padding: 0.2em 0.5em;
   display: none;
   visibility: hidden;
@@ -40,7 +40,8 @@
   &__header {
     display: flex;
     justify-content: space-between;
-    padding: 1em;
+    padding: 1em 0.5em;
+    font-weight: bolder;
   }
 
   &__arrows {
@@ -62,6 +63,7 @@
     display: inline-block;
     width: (100% / 7);
     margin: 0 0 0.8em;
+    font-weight: bolder;
   }
 
   &__days {
@@ -71,25 +73,27 @@
   }
 
   &__day-item {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: (100% / 7);
     flex-basis: (100% / 7);
+    margin: 0.5em 1%;
     cursor: pointer;
     border-radius: 50%;
-    transition: all 0.2s;
-    // max-width: 40px;
-    max-height: 37px;
-    // min-height: 40px;
-    line-height: 37px;
-    margin-bottom: 0.5em;
+    transition: background-color 0.2s ease;
+    max-width: 39px;
+    height: 39px;
+    line-height: 39px;
 
     &:hover {
-      box-shadow: 0 0 3px 2px $gray;
+      background-color: $gray;
+      color: #fff;
     }
   }
 
   &__day-item--today {
-    box-shadow: 0 0 6px $gray;
+    box-shadow: 0 0 2px $gray;
   }
 
   &__day-item--selected {

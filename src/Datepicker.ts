@@ -18,6 +18,8 @@ interface IElemPosition {
 }
 
 interface IOptions {
+  // configs
+  defaultValue: Date | string | boolean
   autoClose: boolean
   multiple: boolean
   multipleSeparator: string
@@ -25,6 +27,7 @@ interface IOptions {
   format: string
   classNames: {
     baseClassName: string
+    monthWrapperClassName: string
     // headers class name:
     headerClassName: string
     arrowsClassName: string
@@ -49,10 +52,12 @@ interface IOptions {
   }
   weekName: Array<string>
   monthName: Array<string>
+  // events:
   onClick?: (selectedDate: ISelectedDates, self: Datepicker) => void
 }
 
 const defaultOptionsValue: IOptions = {
+  defaultValue: false,
   autoClose: false,
   multiple: false,
   multipleSeparator: ' - ',
@@ -60,6 +65,7 @@ const defaultOptionsValue: IOptions = {
   format: 'jYYYY/jM/jD',
   classNames: {
     baseClassName: constants.baseClassName,
+    monthWrapperClassName: constants.monthWrapperClassName,
     // headers class name:
     headerClassName: constants.headerClassName,
     arrowsClassName: constants.arrowsClassName,
@@ -76,13 +82,13 @@ const defaultOptionsValue: IOptions = {
     dayItemClassName: constants.dayItemClassName,
     selectedDayItemClassName: constants.selectedDayItemClassName,
     // footer class name:
-    footerClassName: constants.footerClassName
+    footerClassName: constants.footerClassName,
   },
   arrows: {
     left:
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.175 477.175"><path d="M145.188 238.575l215.5-215.5c5.3-5.3 5.3-13.8 0-19.1s-13.8-5.3-19.1 0l-225.1 225.1c-5.3 5.3-5.3 13.8 0 19.1l225.1 225c2.6 2.6 6.1 4 9.5 4s6.9-1.3 9.5-4c5.3-5.3 5.3-13.8 0-19.1l-215.4-215.5z"/></svg>',
     right:
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.175 477.175"><path d="M360.731 229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1 0s-5.3 13.8 0 19.1l215.5 215.5-215.5 215.5c-5.3 5.3-5.3 13.8 0 19.1 2.6 2.6 6.1 4 9.5 4 3.4 0 6.9-1.3 9.5-4l225.1-225.1c5.3-5.2 5.3-13.8.1-19z"/></svg>'
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.175 477.175"><path d="M360.731 229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1 0s-5.3 13.8 0 19.1l215.5 215.5-215.5 215.5c-5.3 5.3-5.3 13.8 0 19.1 2.6 2.6 6.1 4 9.5 4 3.4 0 6.9-1.3 9.5-4l225.1-225.1c5.3-5.2 5.3-13.8.1-19z"/></svg>',
   },
   weekName: ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'],
   monthName: [
@@ -97,8 +103,8 @@ const defaultOptionsValue: IOptions = {
     'آذر',
     'دی',
     'بهمن',
-    'اسفند'
-  ]
+    'اسفند',
+  ],
 }
 
 class Datepicker {
@@ -149,7 +155,6 @@ class PrivateDatepicker {
     } else {
       this.elem = elemExist
     }
-
     this.options = Object.assign(defaultOptionsValue, options)
     this.pickerPrivater = pickerPrivater
     this.calendarElem = document.createElement('div')
@@ -159,9 +164,24 @@ class PrivateDatepicker {
     this.todayYear = this.today.jYear()
     this.currentMonth = this.todayMonth
     this.currentYear = this.todayYear
-    this.createElement()
     this.isOpen = false
     this.handleClickOutside()
+
+    if (this.options.defaultValue) {
+      const momentedDefaultValue = this.getMomented(
+        moment(
+          typeof this.options.defaultValue === 'boolean' ? new Date() : this.options.defaultValue
+        ).format(this.options.format)
+      )
+
+      this.currentMonth = momentedDefaultValue.jMonth()
+      this.currentYear = momentedDefaultValue.jYear()
+
+      this.setValue(momentedDefaultValue)
+    }
+
+    this.createElement()
+
     window.addEventListener('resize', () => {
       if (!this.isOpen) {
         return
@@ -169,6 +189,23 @@ class PrivateDatepicker {
       clearTimeout(this.timeoutTemp)
       this.timeoutTemp = setTimeout(this.setPosition, this.options.timeout)
     })
+  }
+
+  public open = (): void => {
+    if (this.isOpen) return
+    this.isOpen = true
+    this.setPosition()
+    this.addOpenClass()
+  }
+
+  public close = (): void => {
+    if (!this.isOpen) return
+    this.isOpen = false
+    this.removeOpenClass()
+  }
+
+  public getValue = (): ISelectedDates => {
+    return this.selectedDates
   }
 
   private calculateDaysInCurrentMonth = (): void => {
@@ -199,12 +236,22 @@ class PrivateDatepicker {
     }
 
     // append header and body for calendar
-    this.calendarElem.appendChild(this.createHeader())
-    this.calendarElem.appendChild(this.createBody())
+    const monthWrapper = this.createMonthWrapper()
+    monthWrapper.appendChild(this.createHeader())
+    monthWrapper.appendChild(this.createBody())
+    this.calendarElem.appendChild(monthWrapper)
 
     document.body.appendChild(this.calendarElem)
 
     this.elem.addEventListener('click', this.open)
+  }
+
+  private createMonthWrapper = (): HTMLElement => {
+    const { options } = this
+    const monthWrapper = document.createElement('div')
+
+    monthWrapper.classList.add(options.classNames.monthWrapperClassName)
+    return monthWrapper
   }
 
   private createHeader = (): HTMLElement => {
@@ -247,24 +294,6 @@ class PrivateDatepicker {
     return header
   }
 
-  private goNextMonth = (e: MouseEvent): void => {
-    this.currentMonth = this.currentMonth !== 11 ? ++this.currentMonth : 0
-    if (this.currentMonth === 0) {
-      this.currentYear++
-    }
-    this.daysInCurrentMonth = []
-    this.createElement()
-  }
-
-  private goPrevMonth = (): void => {
-    this.currentMonth = this.currentMonth !== 0 ? --this.currentMonth : 11
-    if (this.currentMonth === 11) {
-      this.currentYear--
-    }
-    this.daysInCurrentMonth = []
-    this.createElement()
-  }
-
   private createBody = (): HTMLElement => {
     const { options, daysInCurrentMonth, currentYear, currentMonth, selectedDates } = this,
       body = document.createElement('div'),
@@ -291,7 +320,7 @@ class PrivateDatepicker {
           ? options.classNames.dayItemClassName + '--today'
           : ''
 
-      const indexOfSelectedDates = selectedDates.findIndex(selectedItem => {
+      const indexOfSelectedDates = selectedDates.findIndex((selectedItem) => {
         return selectedItem.value === dateValue
       })
       let selectedDate: string
@@ -317,7 +346,7 @@ class PrivateDatepicker {
     body.appendChild(weeks)
     body.appendChild(days)
 
-    body.addEventListener('click', e => {
+    body.addEventListener('click', (e) => {
       const target: HTMLElement = e.target as HTMLElement
       if (
         !(
@@ -330,11 +359,8 @@ class PrivateDatepicker {
 
       const isDateValueNull = target.getAttribute('data-date')
       const dateValue = isDateValueNull ? isDateValueNull : ''
-      const momented = this.getMomented(dateValue)
       const targetSiblings = siblings(target)
-      const indexOfSelectedDates = selectedDates.findIndex(selectedItem => {
-        return selectedItem.value === dateValue
-      })
+      const indexOfSelectedDates = this.getSelectedIndex(dateValue)
 
       if (!options.multiple) {
         for (let i = 0; i < targetSiblings.length; i++) {
@@ -353,31 +379,7 @@ class PrivateDatepicker {
         target.classList.add(options.classNames.selectedDayItemClassName)
       }
 
-      if (options.multiple) {
-        if (indexOfSelectedDates === -1) {
-          this.selectedDates.push({
-            ISO: momented.toISOString(),
-            timestamp: momented.toDate().getTime(),
-            value: dateValue
-          })
-
-          this.addElemValue(`${momented.format(options.format)}${options.multipleSeparator}`)
-        } else {
-          this.selectedDates.splice(indexOfSelectedDates, 1)
-
-          this.replaceElemValue(
-            `${momented.format(options.format)}${options.multipleSeparator}`,
-            ''
-          )
-        }
-      } else {
-        this.selectedDates[0] = {
-          ISO: momented.toISOString(),
-          timestamp: momented.toDate().getTime(),
-          value: dateValue
-        }
-        this.setElemValue(dateValue)
-      }
+      this.setValue(dateValue)
 
       if (typeof options.onClick === 'function') {
         this.onClickEvt(this.selectedDates)
@@ -389,6 +391,24 @@ class PrivateDatepicker {
     })
 
     return body
+  }
+
+  private goNextMonth = (e: MouseEvent): void => {
+    this.currentMonth = this.currentMonth !== 11 ? ++this.currentMonth : 0
+    if (this.currentMonth === 0) {
+      this.currentYear++
+    }
+    this.daysInCurrentMonth = []
+    this.createElement()
+  }
+
+  private goPrevMonth = (): void => {
+    this.currentMonth = this.currentMonth !== 0 ? --this.currentMonth : 11
+    if (this.currentMonth === 11) {
+      this.currentYear--
+    }
+    this.daysInCurrentMonth = []
+    this.createElement()
   }
 
   private onClickEvt = (selectedDate: ISelectedDates) => {
@@ -415,7 +435,7 @@ class PrivateDatepicker {
 
     this.elemPosition = {
       top: rect.top - elemWin.pageYOffset,
-      left: rect.left - elemWin.pageXOffset
+      left: rect.left - elemWin.pageXOffset,
     }
   }
 
@@ -441,21 +461,14 @@ class PrivateDatepicker {
     this.calendarElem.style.top = `${offsetHeight + top}px`
   }
 
-  private getMomented = (date: string, format?: string): Moment => {
-    return moment(`${date}`, format ? format : this.options.format)
-  }
+  private getMomented = (date: Date | Moment | string, format?: string): Moment => {
+    const finalFormat = format ? format : this.options.format
 
-  public open = (): void => {
-    if (this.isOpen) return
-    this.isOpen = true
-    this.setPosition()
-    this.addOpenClass()
-  }
+    if (moment.isMoment(date) || date instanceof Date) {
+      return moment(date, finalFormat)
+    }
 
-  public close = (): void => {
-    if (!this.isOpen) return
-    this.isOpen = false
-    this.removeOpenClass()
+    return moment(date, finalFormat)
   }
 
   private addOpenClass = (): void => {
@@ -478,12 +491,12 @@ class PrivateDatepicker {
     /**
      * inspired by https://codepen.io/craigmdennis/pen/VYVBXR
      */
-    this.calendarElem.addEventListener('click', e => {
+    this.calendarElem.addEventListener('click', (e) => {
       e.preventDefault()
       e.stopImmediatePropagation()
     })
 
-    document.addEventListener('click', e => {
+    document.addEventListener('click', (e) => {
       if (e.target == this.elem) return
       if (!(e.target == this.calendarElem)) {
         this.close()
@@ -515,8 +528,44 @@ class PrivateDatepicker {
     }
   }
 
-  public getValue = (): ISelectedDates => {
-    return this.selectedDates
+  private setValue = (dateValue: Moment | string) => {
+    const { options } = this
+    const momented = moment.isMoment(dateValue) ? dateValue : this.getMomented(dateValue)
+    const indexOfSelectedDates = this.getSelectedIndex(dateValue)
+
+    if (options.multiple) {
+      if (indexOfSelectedDates === -1) {
+        this.selectedDates.push({
+          ISO: momented.toISOString(),
+          timestamp: momented.toDate().getTime(),
+          value: momented.format(options.format),
+        })
+
+        this.addElemValue(`${momented.format(options.format)}${options.multipleSeparator}`)
+      } else {
+        this.selectedDates.splice(indexOfSelectedDates, 1)
+
+        this.replaceElemValue(`${momented.format(options.format)}${options.multipleSeparator}`, '')
+      }
+    } else {
+      this.selectedDates[0] = {
+        ISO: momented.toISOString(),
+        timestamp: momented.toDate().getTime(),
+        value: momented.format(options.format),
+      }
+
+      this.setElemValue(momented.format(options.format))
+    }
+  }
+
+  private getSelectedIndex = (dateValue: Moment | string): number => {
+    const { selectedDates, options } = this
+
+    const momented = this.getMomented(dateValue)
+
+    return selectedDates.findIndex((selectedItem) => {
+      return selectedItem.value === momented.format(options.format)
+    })
   }
 }
 

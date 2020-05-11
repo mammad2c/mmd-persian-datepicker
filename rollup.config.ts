@@ -20,13 +20,13 @@ export default {
       name: 'MmdPersianDatepicker',
       format: 'umd',
       sourcemap: true,
-      globals: { 'moment-jalaali': 'moment' }
-    }
+      globals: { 'moment-jalaali': 'moment' },
+    },
   ],
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
   external: ['moment-jalaali'],
   watch: {
-    include: 'src/**'
+    include: 'src/**',
   },
   plugins: [
     // Allow json resolution
@@ -43,6 +43,6 @@ export default {
     // Resolve source maps to the original source
     sourceMaps(),
     scss(),
-    isProduction && uglify()
-  ]
+    isProduction && uglify(),
+  ],
 }

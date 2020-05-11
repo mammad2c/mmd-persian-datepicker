@@ -29,7 +29,7 @@ you have to installed [NodeJS v8](https://nodejs.org) up and recommended install
 
 #### Configs:
 
-- [x] `defaultValue`: initial value, should be today by default on initial render.
+- [x] ~~`defaultValue`: initial value, should be today by default on initial render.~~
 - [ ] `numberOfMonths`: how many months should be rendered.
 - [ ] `rangeSelector`: enable selecting range of dates.
 - [ ] `disabledDates`: disable only some dates.

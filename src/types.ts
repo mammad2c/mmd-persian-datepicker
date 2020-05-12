@@ -43,6 +43,7 @@ export interface IOptions<T> {
     dayItemClassName: string
     selectedDayItemClassName: string
     inRangeDayItemClassName: string
+    todayClassName: string
     // footer class name:
     footerClassName: string
   }

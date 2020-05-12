@@ -3,7 +3,7 @@ import moment, { Moment } from 'moment-jalaali'
 // library imports
 import { constants } from './constants'
 import { siblings } from './utils/siblings'
-import { IElemPosition, IOptions, ISelectedDates } from './types'
+import { IElemPosition, IOptions, ISelectedDates, ISelectedDateItem } from './types'
 
 const defaultOptionsValue: IOptions<Datepicker> = {
   defaultValue: false,
@@ -33,6 +33,7 @@ const defaultOptionsValue: IOptions<Datepicker> = {
     dayItemClassName: constants.dayItemClassName,
     selectedDayItemClassName: constants.selectedDayItemClassName,
     inRangeDayItemClassName: constants.inRangeDayItemClassName,
+    todayClassName: constants.todayClassName,
     // footer class name:
     footerClassName: constants.footerClassName,
   },
@@ -211,7 +212,6 @@ class PrivateDatepicker {
     }
 
     document.body.appendChild(this.calendarElem)
-
     this.elem.addEventListener('click', this.open)
   }
 
@@ -295,30 +295,10 @@ class PrivateDatepicker {
 
     for (let i = 1; i <= daysInCurrentMonth.length; i++) {
       const dateValue = `${year}/${month}/${i}`
-
-      const todayClass =
-        this.todayYear === year && this.todayMonth === month - 1 && i === this.todayDay
-          ? options.classNames.dayItemClassName + '--today'
-          : ''
-
-      const indexOfSelectedDates = this.getSelectedIndex(dateValue)
-
-      let selectedDate: string
-
-      if (options.multiple) {
-        selectedDate =
-          indexOfSelectedDates !== -1 ? options.classNames.selectedDayItemClassName : ''
-      } else {
-        selectedDate =
-          selectedDates.length > 0 && selectedDates[0].value === dateValue
-            ? options.classNames.selectedDayItemClassName
-            : ''
-      }
-
       const dayItem = document.createElement('span')
       const dayItemText = document.createTextNode(`${i}`)
 
-      dayItem.className = `${options.classNames.dayItemClassName} ${todayClass} ${selectedDate}`
+      dayItem.classList.add(options.classNames.dayItemClassName)
       dayItem.dataset.date = dateValue
       dayItem.appendChild(dayItemText)
 
@@ -337,6 +317,8 @@ class PrivateDatepicker {
 
     body.appendChild(weeks)
     body.appendChild(days)
+
+    this.handleDaysState()
 
     body.addEventListener('click', this.onDayClick)
 
@@ -385,7 +367,7 @@ class PrivateDatepicker {
     const isDateValueNull = target.getAttribute('data-date')
     const dateValue = isDateValueNull ? isDateValueNull : ''
 
-    this.setValue(dateValue, e)
+    this.setValue(dateValue)
 
     if (typeof options.onClick === 'function') {
       this.handleOnClickEvent(this.selectedDates)
@@ -419,7 +401,7 @@ class PrivateDatepicker {
     }
 
     if (!momented.isAfter(startDate.momented)) {
-      this.setValue(momented, e)
+      this.setValue(momented)
     } else {
       const diff = momented.diff(startDate.momented, 'd')
       let diffMomented = []
@@ -464,53 +446,50 @@ class PrivateDatepicker {
     }
   }
 
-  private handleDayState = (e: MouseEvent) => {
+  private handleDaysState = () => {
     const { options, selectedDates } = this
-    const target = this.getValidDayTarget(e)
+    const { classNames } = options
+    const days = this.calendarElem.querySelectorAll(`.${classNames.dayItemClassName}`)
+    const startDate = selectedDates[0]
 
-    if (!target) {
+    if (!days) {
       return
     }
 
-    const isDateValueNull = target.getAttribute('data-date')
-    const dateValue = isDateValueNull ? isDateValueNull : ''
-    const days = this.calendarElem.querySelectorAll(`.${options.classNames.dayItemClassName}`)
-    const indexOfSelectedDates = this.getSelectedIndex(dateValue)
-    const startDate = selectedDates[0]
+    for (let i = 0; i < days.length; i++) {
+      const day = days[i]
+      const dayDateValue = day.getAttribute('data-date')
 
-    if (!options.multiple) {
-      if (days) {
-        for (let i = 0; i < days.length; i++) {
-          const day = days[i]
+      if (dayDateValue) {
+        const momented = this.getMomented(dayDateValue)
+        const indexOfSelectedDates = this.findSelectedDate(momented)
 
-          if (day.classList.contains(options.classNames.selectedDayItemClassName)) {
-            day.classList.remove(options.classNames.selectedDayItemClassName)
-          }
+        if (momented.isSame(new Date(), 'd')) {
+          day.classList.add(classNames.todayClassName)
+        }
 
-          if (options.mode === 'range' && startDate) {
-            const dayDateValue = day.getAttribute('data-date')
+        if (day.classList.contains(classNames.selectedDayItemClassName) && !indexOfSelectedDates) {
+          day.classList.remove(classNames.selectedDayItemClassName)
+        } else if (indexOfSelectedDates) {
+          day.classList.add(classNames.selectedDayItemClassName)
+        }
 
-            if (dayDateValue) {
-              const momented = this.getMomented(dayDateValue)
-              const nextStartDate = startDate.momented.clone().add('1', 'day')
+        if (options.multiple && indexOfSelectedDates) {
+          day.classList.add(classNames.selectedDayItemClassName)
+        } else if (options.multiple && !indexOfSelectedDates) {
+          day.classList.remove(classNames.selectedDayItemClassName)
+        }
 
-              if (nextStartDate.isSame(momented)) {
-                day.classList.add(options.classNames.inRangeDayItemClassName)
-              } else if (day.classList.contains(options.classNames.inRangeDayItemClassName)) {
-                day.classList.remove(options.classNames.inRangeDayItemClassName)
-              }
-            }
+        if (options.mode === 'range' && startDate) {
+          const nextStartDate = startDate.momented.clone().add('1', 'day')
+
+          if (nextStartDate.isSame(momented)) {
+            day.classList.add(classNames.inRangeDayItemClassName)
+          } else if (day.classList.contains(classNames.inRangeDayItemClassName)) {
+            day.classList.remove(classNames.inRangeDayItemClassName)
           }
         }
       }
-    }
-
-    if (options.multiple && indexOfSelectedDates === -1) {
-      target.classList.add(options.classNames.selectedDayItemClassName)
-    } else if (options.multiple && indexOfSelectedDates !== -1) {
-      target.classList.remove(options.classNames.selectedDayItemClassName)
-    } else if (!options.multiple) {
-      target.classList.add(options.classNames.selectedDayItemClassName)
     }
   }
 
@@ -631,13 +610,13 @@ class PrivateDatepicker {
     }
   }
 
-  private setValue = (dateValue: Moment | string, e?: MouseEvent) => {
+  private setValue = (dateValue: Moment | string) => {
     const { options } = this
     const momented = moment.isMoment(dateValue) ? dateValue : this.getMomented(dateValue)
-    const indexOfSelectedDates = this.getSelectedIndex(dateValue)
+    const indexOfSelectedDates = this.findSelectedDate(dateValue)
 
     if (options.multiple) {
-      if (indexOfSelectedDates === -1) {
+      if (!indexOfSelectedDates) {
         this.selectedDates.push({
           ISO: momented.toISOString(),
           timestamp: momented.toDate().getTime(),
@@ -647,7 +626,7 @@ class PrivateDatepicker {
 
         this.addElemValue(`${momented.format(options.format)}${options.multipleSeparator}`)
       } else {
-        this.selectedDates.splice(indexOfSelectedDates, 1)
+        this.selectedDates = this.selectedDates.filter((item) => item.momented.isSame(momented))
 
         this.replaceElemValue(`${momented.format(options.format)}${options.multipleSeparator}`, '')
       }
@@ -660,19 +639,18 @@ class PrivateDatepicker {
       }
 
       this.setElemValue(momented.format(options.format))
-      if (e) {
-        this.handleDayState(e)
-      }
     }
+
+    this.handleDaysState()
   }
 
-  private getSelectedIndex = (dateValue: Moment | string): number => {
-    const { selectedDates, options } = this
+  private findSelectedDate = (dateValue: Moment | string): ISelectedDateItem | undefined => {
+    const { selectedDates } = this
 
-    const momented = this.getMomented(dateValue)
+    const momented = moment.isMoment(dateValue) ? dateValue : this.getMomented(dateValue)
 
-    return selectedDates.findIndex((selectedItem) => {
-      return selectedItem.value === momented.format(options.format)
+    return selectedDates.find((item) => {
+      return momented.isSame(item.momented)
     })
   }
 

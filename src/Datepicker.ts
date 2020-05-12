@@ -326,74 +326,12 @@ class PrivateDatepicker {
     body.appendChild(weeks)
     body.appendChild(days)
 
-    body.addEventListener('click', (e) => {
-      const target: HTMLElement = e.target as HTMLElement
-      if (
-        !(
-          target.classList.contains(options.classNames.dayItemClassName) &&
-          target.getAttribute('data-date')
-        )
-      ) {
-        return
-      }
-
-      const isDateValueNull = target.getAttribute('data-date')
-      const dateValue = isDateValueNull ? isDateValueNull : ''
-      const targetSiblings = siblings(target)
-      const targetParentSiblings = siblings(target.parentElement?.parentElement?.parentElement)
-      const indexOfSelectedDates = this.getSelectedIndex(dateValue)
-
-      if (!options.multiple) {
-        if (targetSiblings) {
-          for (let i = 0; i < targetSiblings.length; i++) {
-            const element = targetSiblings[i]
-            if (element.classList.contains(options.classNames.selectedDayItemClassName)) {
-              element.classList.remove(options.classNames.selectedDayItemClassName)
-            }
-          }
-        }
-
-        if (targetParentSiblings) {
-          for (let i = 0; i < targetParentSiblings.length; i++) {
-            const monthWrapper = targetParentSiblings[i]
-
-            if (monthWrapper.classList.contains(options.classNames.monthWrapperClassName)) {
-              const children = monthWrapper.children[1].children[1].children
-              for (let j = 0; j < children.length; j++) {
-                const element = children[j]
-
-                if (element.classList.contains(options.classNames.selectedDayItemClassName)) {
-                  element.classList.remove(options.classNames.selectedDayItemClassName)
-                }
-              }
-            }
-          }
-        }
-      }
-
-      if (options.multiple && indexOfSelectedDates === -1) {
-        target.classList.add(options.classNames.selectedDayItemClassName)
-      } else if (options.multiple && indexOfSelectedDates !== -1) {
-        target.classList.remove(options.classNames.selectedDayItemClassName)
-      } else if (!options.multiple) {
-        target.classList.add(options.classNames.selectedDayItemClassName)
-      }
-
-      this.setValue(dateValue)
-
-      if (typeof options.onClick === 'function') {
-        this.onClickEvt(this.selectedDates)
-      }
-
-      if (options.autoClose) {
-        this.close()
-      }
-    })
+    body.addEventListener('click', this.onDayClick)
 
     return body
   }
 
-  private goNextMonth = (e: MouseEvent): void => {
+  private goNextMonth = (): void => {
     this.currentMonth = this.currentMonth !== 11 ? ++this.currentMonth : 0
     if (this.currentMonth === 0) {
       this.currentYear++
@@ -409,7 +347,72 @@ class PrivateDatepicker {
     this.createElement()
   }
 
-  private onClickEvt = (selectedDate: ISelectedDates) => {
+  private onDayClick = (e: MouseEvent) => {
+    const { options } = this
+    const target: HTMLElement = e.target as HTMLElement
+    if (
+      !(
+        target.classList.contains(options.classNames.dayItemClassName) &&
+        target.getAttribute('data-date')
+      )
+    ) {
+      return
+    }
+
+    const isDateValueNull = target.getAttribute('data-date')
+    const dateValue = isDateValueNull ? isDateValueNull : ''
+    const targetSiblings = siblings(target)
+    const targetParentSiblings = siblings(target.parentElement?.parentElement?.parentElement)
+    const indexOfSelectedDates = this.getSelectedIndex(dateValue)
+
+    if (!options.multiple) {
+      if (targetSiblings) {
+        for (let i = 0; i < targetSiblings.length; i++) {
+          const element = targetSiblings[i]
+          if (element.classList.contains(options.classNames.selectedDayItemClassName)) {
+            element.classList.remove(options.classNames.selectedDayItemClassName)
+          }
+        }
+      }
+
+      if (targetParentSiblings) {
+        for (let i = 0; i < targetParentSiblings.length; i++) {
+          const monthWrapper = targetParentSiblings[i]
+
+          if (monthWrapper.classList.contains(options.classNames.monthWrapperClassName)) {
+            const children = monthWrapper.children[1].children[1].children
+            for (let j = 0; j < children.length; j++) {
+              const element = children[j]
+
+              if (element.classList.contains(options.classNames.selectedDayItemClassName)) {
+                element.classList.remove(options.classNames.selectedDayItemClassName)
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (options.multiple && indexOfSelectedDates === -1) {
+      target.classList.add(options.classNames.selectedDayItemClassName)
+    } else if (options.multiple && indexOfSelectedDates !== -1) {
+      target.classList.remove(options.classNames.selectedDayItemClassName)
+    } else if (!options.multiple) {
+      target.classList.add(options.classNames.selectedDayItemClassName)
+    }
+
+    this.setValue(dateValue)
+
+    if (typeof options.onClick === 'function') {
+      this.handleOnClickEvent(this.selectedDates)
+    }
+
+    if (options.autoClose) {
+      this.close()
+    }
+  }
+
+  private handleOnClickEvent = (selectedDate: ISelectedDates) => {
     const { onClick } = this.options
 
     if (!onClick) {

@@ -3,7 +3,7 @@ import moment, { Moment } from 'moment-jalaali'
 // library imports
 import { constants } from './constants'
 import { siblings } from './utils/siblings'
-import { IElemPosition, IOptions, ISelectedDateItem, ISelectedDates } from './types'
+import { IElemPosition, IOptions, ISelectedDates } from './types'
 
 const defaultOptionsValue: IOptions<Datepicker> = {
   defaultValue: false,

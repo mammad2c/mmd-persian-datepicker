@@ -403,12 +403,29 @@ class PrivateDatepicker {
 
     this.setValue(dateValue)
 
+    // if (options.mode === 'range') {
+    //   console.log(this.selectedDates)
+    // }
+
     if (typeof options.onClick === 'function') {
       this.handleOnClickEvent(this.selectedDates)
     }
 
     if (options.autoClose) {
       this.close()
+    }
+  }
+
+  private onDayHover = (e: MouseEvent) => {
+    const { options } = this
+    const target: HTMLElement = e.target as HTMLElement
+    if (
+      !(
+        target.classList.contains(options.classNames.dayItemClassName) &&
+        target.getAttribute('data-date')
+      )
+    ) {
+      return
     }
   }
 
@@ -540,6 +557,7 @@ class PrivateDatepicker {
           ISO: momented.toISOString(),
           timestamp: momented.toDate().getTime(),
           value: momented.format(options.format),
+          momented,
         })
 
         this.addElemValue(`${momented.format(options.format)}${options.multipleSeparator}`)
@@ -553,6 +571,7 @@ class PrivateDatepicker {
         ISO: momented.toISOString(),
         timestamp: momented.toDate().getTime(),
         value: momented.format(options.format),
+        momented,
       }
 
       this.setElemValue(momented.format(options.format))

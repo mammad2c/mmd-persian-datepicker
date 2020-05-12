@@ -1,7 +1,10 @@
+import { Moment } from 'moment-jalaali'
+
 export interface ISelectedDateItem {
   ISO: string
   timestamp: number
   value: any
+  momented: Moment
 }
 
 export interface ISelectedDates extends Array<ISelectedDateItem> {}

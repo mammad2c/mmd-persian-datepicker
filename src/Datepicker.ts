@@ -23,6 +23,7 @@ interface IOptions {
   autoClose: boolean
   multiple: boolean
   multipleSeparator: string
+  numberOfMonths: number
   timeout: number
   format: string
   classNames: {
@@ -51,7 +52,7 @@ interface IOptions {
     right: string
   }
   weekName: Array<string>
-  monthName: Array<string>
+  monthNames: Array<string>
   // events:
   onClick?: (selectedDate: ISelectedDates, self: Datepicker) => void
 }
@@ -61,6 +62,7 @@ const defaultOptionsValue: IOptions = {
   autoClose: false,
   multiple: false,
   multipleSeparator: ' - ',
+  numberOfMonths: 1,
   timeout: 250,
   format: 'jYYYY/jM/jD',
   classNames: {
@@ -91,7 +93,7 @@ const defaultOptionsValue: IOptions = {
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.175 477.175"><path d="M360.731 229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1 0s-5.3 13.8 0 19.1l215.5 215.5-215.5 215.5c-5.3 5.3-5.3 13.8 0 19.1 2.6 2.6 6.1 4 9.5 4 3.4 0 6.9-1.3 9.5-4l225.1-225.1c5.3-5.2 5.3-13.8.1-19z"/></svg>',
   },
   weekName: ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'],
-  monthName: [
+  monthNames: [
     'فروردین',
     'اردیبهشت',
     'خرداد',
@@ -215,16 +217,21 @@ class PrivateDatepicker {
     }
   }
 
-  private calculateFirstDayOfMonth = (): string => {
-    const firstDayOfMonth = moment(`${this.currentYear}/${this.currentMonth + 1}/1`, 'jYYYY/jM/jD')
+  private calculateFirstDayOfMonth = (additional: number = 0): string => {
+    const { currentMonth, currentYear, options } = this
+    const monthOverflow = this.isMonthOverflow(additional)
+    const month = monthOverflow ? 1 : currentMonth + additional
+    const year = monthOverflow ? currentYear + 1 : currentYear
+    const firstDayOfMonth = moment(`${year}/${month + 1}/1`, 'jYYYY/jM/jD')
       .day()
       .toString()
     const weekFa = ['1', '2', '3', '4', '5', '6', '0']
+
     return weekFa[+firstDayOfMonth]
   }
 
   private createElement = (): void => {
-    const options = this.options
+    const { options } = this
     this.calendarElem.setAttribute('id', `${this.elem.getAttribute('id')}-calendar`)
     this.calendarElem.classList.add(options.classNames.baseClassName)
 
@@ -235,11 +242,18 @@ class PrivateDatepicker {
       this.calendarElem.removeChild(this.calendarElem.firstChild)
     }
 
+    // create arrows
+    const { arrowLeft, arrowRight } = this.createArrowsNavigation()
+    this.calendarElem.appendChild(arrowRight)
+    this.calendarElem.appendChild(arrowLeft)
+
     // append header and body for calendar
-    const monthWrapper = this.createMonthWrapper()
-    monthWrapper.appendChild(this.createHeader())
-    monthWrapper.appendChild(this.createBody())
-    this.calendarElem.appendChild(monthWrapper)
+    for (let index = 0; index < options.numberOfMonths; index++) {
+      const monthWrapper = this.createMonthWrapper()
+      monthWrapper.appendChild(this.createHeader(index))
+      monthWrapper.appendChild(this.createBody(index))
+      this.calendarElem.appendChild(monthWrapper)
+    }
 
     document.body.appendChild(this.calendarElem)
 
@@ -254,29 +268,16 @@ class PrivateDatepicker {
     return monthWrapper
   }
 
-  private createHeader = (): HTMLElement => {
-    const { options } = this,
-      header = document.createElement('div'),
-      arrowRight = document.createElement('span'),
-      title = document.createElement('div'),
-      arrowLeft = document.createElement('span')
-
-    header.classList.add(options.classNames.headerClassName)
+  private createArrowsNavigation = () => {
+    const { options } = this
+    const arrowRight = document.createElement('span')
+    const arrowLeft = document.createElement('span')
 
     arrowRight.classList.add(
       `${options.classNames.arrowsClassName}`,
       `${options.classNames.arrowsRightClassName}`
     )
     arrowRight.innerHTML = options.arrows.right
-
-    title.classList.add(options.classNames.titleClassName)
-    title.innerHTML = `
-			<span class="${options.classNames.titleMonthClassName}">
-			${options.monthName[this.currentMonth]}
-			</span>
-			<span class="${options.classNames.titleYearClassName}">
-				${this.currentYear}
-			</span>`
 
     arrowLeft.classList.add(
       `${options.classNames.arrowsClassName}`,
@@ -287,23 +288,48 @@ class PrivateDatepicker {
     arrowRight.addEventListener('click', this.goPrevMonth)
     arrowLeft.addEventListener('click', this.goNextMonth)
 
-    header.appendChild(arrowRight)
+    return { arrowLeft, arrowRight }
+  }
+
+  private createHeader = (additional: number = 0): HTMLElement => {
+    const { options, currentMonth, currentYear } = this
+    const { monthNames, classNames } = options
+    const header = document.createElement('div')
+    const title = document.createElement('div')
+
+    const monthOverflow = this.isMonthOverflow(additional)
+
+    const monthName = monthOverflow ? monthNames[0] : monthNames[currentMonth + additional]
+
+    const year = monthOverflow ? currentYear + 1 : currentYear
+
+    header.classList.add(classNames.headerClassName)
+    title.classList.add(classNames.titleClassName)
+    title.innerHTML = `
+			<span class="${classNames.titleMonthClassName}">
+			${monthName}
+			</span>
+			<span class="${classNames.titleYearClassName}">
+				${year}
+			</span>`
+
     header.appendChild(title)
-    header.appendChild(arrowLeft)
 
     return header
   }
 
-  private createBody = (): HTMLElement => {
-    const { options, daysInCurrentMonth, currentYear, currentMonth, selectedDates } = this,
-      body = document.createElement('div'),
-      days = document.createElement('div'),
-      weeks = document.createElement('div'),
-      weekName = options.weekName,
-      offsetStartWeek = parseInt(this.calculateFirstDayOfMonth())
+  private createBody = (additional: number = 0): HTMLElement => {
+    const { options, daysInCurrentMonth, currentYear, currentMonth, selectedDates } = this
+    const body = document.createElement('div')
+    const days = document.createElement('div')
+    const weeks = document.createElement('div')
+    const { weekName } = options
+    const offsetStartWeek = parseInt(this.calculateFirstDayOfMonth(additional))
+    const monthOverflow = this.isMonthOverflow(additional)
+    const month = monthOverflow ? 1 : currentMonth + additional + 1
+    const year = monthOverflow ? currentYear + 1 : currentYear
 
     body.classList.add(options.classNames.bodyClassName)
-
     days.classList.add(options.classNames.daysClassName)
 
     for (let i = 0; i < offsetStartWeek; i++) {
@@ -311,18 +337,15 @@ class PrivateDatepicker {
     }
 
     for (let i = 1; i <= daysInCurrentMonth.length; i++) {
-      const dateValue = `${currentYear}/${currentMonth + 1}/${i}`
+      const dateValue = `${year}/${month}/${i}`
 
       const todayClass =
-        this.todayYear === this.currentYear &&
-        this.todayMonth === this.currentMonth &&
-        i === this.todayDay
+        this.todayYear === year && this.todayMonth === month - 1 && i === this.todayDay
           ? options.classNames.dayItemClassName + '--today'
           : ''
 
-      const indexOfSelectedDates = selectedDates.findIndex((selectedItem) => {
-        return selectedItem.value === dateValue
-      })
+      const indexOfSelectedDates = this.getSelectedIndex(dateValue)
+
       let selectedDate: string
 
       if (options.multiple) {
@@ -339,6 +362,7 @@ class PrivateDatepicker {
     }
 
     weeks.classList.add(options.classNames.weeksClassName)
+
     for (let i = 0; i < weekName.length; i++) {
       weeks.innerHTML += `<span class="${options.classNames.weekItemClassName}">${weekName[i]}</span>`
     }
@@ -360,13 +384,33 @@ class PrivateDatepicker {
       const isDateValueNull = target.getAttribute('data-date')
       const dateValue = isDateValueNull ? isDateValueNull : ''
       const targetSiblings = siblings(target)
+      const targetParentSiblings = siblings(target.parentElement?.parentElement?.parentElement)
       const indexOfSelectedDates = this.getSelectedIndex(dateValue)
 
       if (!options.multiple) {
-        for (let i = 0; i < targetSiblings.length; i++) {
-          const element = targetSiblings[i]
-          if (element.classList.contains(options.classNames.selectedDayItemClassName)) {
-            element.classList.remove(options.classNames.selectedDayItemClassName)
+        if (targetSiblings) {
+          for (let i = 0; i < targetSiblings.length; i++) {
+            const element = targetSiblings[i]
+            if (element.classList.contains(options.classNames.selectedDayItemClassName)) {
+              element.classList.remove(options.classNames.selectedDayItemClassName)
+            }
+          }
+        }
+
+        if (targetParentSiblings) {
+          for (let i = 0; i < targetParentSiblings.length; i++) {
+            const monthWrapper = targetParentSiblings[i]
+
+            if (monthWrapper.classList.contains(options.classNames.monthWrapperClassName)) {
+              const children = monthWrapper.children[1].children[1].children
+              for (let j = 0; j < children.length; j++) {
+                const element = children[j]
+
+                if (element.classList.contains(options.classNames.selectedDayItemClassName)) {
+                  element.classList.remove(options.classNames.selectedDayItemClassName)
+                }
+              }
+            }
           }
         }
       }
@@ -566,6 +610,10 @@ class PrivateDatepicker {
     return selectedDates.findIndex((selectedItem) => {
       return selectedItem.value === momented.format(options.format)
     })
+  }
+
+  private isMonthOverflow = (additional: number = 0): boolean => {
+    return additional + this.currentMonth >= this.options.monthNames.length
   }
 }
 

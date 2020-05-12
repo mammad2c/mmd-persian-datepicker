@@ -1,7 +1,5 @@
 .mmd-picker {
   position: absolute;
-  width: $pickerWidth;
-  padding: 0.2em 0.5em;
   display: none;
   visibility: hidden;
   opacity: 0;
@@ -10,6 +8,8 @@
   box-shadow: 0 1px 7px rgba($color: #000000, $alpha: 0.1);
   border-radius: 4px;
   direction: rtl;
+  display: flex;
+  transform: translateY(-10px);
 
   *,
   *::before,
@@ -28,48 +28,65 @@
   }
 
   &--open {
-    display: inline-block;
+    display: flex;
     z-index: 99999;
   }
 
   &--open-animated {
     visibility: visible;
     opacity: 1;
+    transform: none;
+  }
+
+  &__month-wrapper {
+    width: $pickerWidth;
   }
 
   &__header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     padding: 1em 0.5em;
     font-weight: bolder;
   }
 
   &__arrows {
     cursor: pointer;
+    position: absolute;
+    top: 1em;
 
     svg {
       width: 1em;
       height: 1em;
+    }
+
+    &--right {
+      right: 1em;
+    }
+
+    &--left {
+      left: 1em;
     }
   }
 
   &__weeks {
     text-align: center;
     display: flex;
-    justify-content: space-between;
+    padding: 0 2px;
   }
 
   &__week-item {
-    display: inline-block;
+    display: inline-flex;
     width: (100% / 7);
     margin: 0 0 0.8em;
     font-weight: bolder;
+    justify-content: center;
   }
 
   &__days {
     display: flex;
     flex-wrap: wrap;
     text-align: center;
+    padding-right: 2px;
   }
 
   &__day-item {
@@ -78,13 +95,13 @@
     justify-content: center;
     width: (100% / 7);
     flex-basis: (100% / 7);
-    margin: 0.5em 1%;
     cursor: pointer;
     border-radius: 50%;
+    margin: 1px;
     transition: background-color 0.2s ease;
-    max-width: 39px;
-    height: 39px;
-    line-height: 39px;
+    max-width: 45px;
+    height: 45px;
+    line-height: 45px;
 
     &:hover {
       background-color: $gray;

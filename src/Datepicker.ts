@@ -32,6 +32,7 @@ const defaultOptionsValue: IOptions<Datepicker> = {
     daysClassName: constants.daysClassName,
     dayItemClassName: constants.dayItemClassName,
     selectedDayItemClassName: constants.selectedDayItemClassName,
+    inRangeDayItemClassName: constants.inRangeDayItemClassName,
     // footer class name:
     footerClassName: constants.footerClassName,
   },
@@ -358,7 +359,7 @@ class PrivateDatepicker {
     this.createElement()
   }
 
-  private onDayClick = (e: MouseEvent) => {
+  private getValidDayTarget = (e: MouseEvent): HTMLElement | null => {
     const { options } = this
     const target: HTMLElement = e.target as HTMLElement
     if (
@@ -367,43 +368,80 @@ class PrivateDatepicker {
         target.getAttribute('data-date')
       )
     ) {
+      return null
+    }
+
+    return target
+  }
+
+  private onDayClick = (e: MouseEvent) => {
+    const { options } = this
+    const target = this.getValidDayTarget(e)
+
+    if (!target) {
       return
     }
 
     const isDateValueNull = target.getAttribute('data-date')
     const dateValue = isDateValueNull ? isDateValueNull : ''
-    const targetSiblings = siblings(target)
-    const targetMonthWrapperSiblings = siblings(target.parentElement?.parentElement?.parentElement)
+
+    this.setValue(dateValue, e)
+
+    if (typeof options.onClick === 'function') {
+      this.handleOnClickEvent(this.selectedDates)
+    }
+
+    if (options.autoClose) {
+      this.close()
+    }
+  }
+
+  private onDayHover = (e: MouseEvent) => {
+    const { options, selectedDates } = this
+    const target = this.getValidDayTarget(e)
+
+    if (!target) {
+      return
+    }
+
+    const dateValue = target.dataset.date
+
+    if (!dateValue) {
+      return
+    }
+
+    const momented = this.getMomented(dateValue)
+
+    const startDate = selectedDates[0]
+
+    if (!startDate) {
+      return
+    }
+
+    if (!momented.isAfter(startDate.momented)) {
+      this.setValue(momented, e)
+    }
+  }
+
+  private handleDayState = (e: MouseEvent) => {
+    const { options } = this
+    const target = this.getValidDayTarget(e)
+
+    if (!target) {
+      return
+    }
+
+    const isDateValueNull = target.getAttribute('data-date')
+    const dateValue = isDateValueNull ? isDateValueNull : ''
+    const days = this.calendarElem.querySelectorAll(`.${options.classNames.dayItemClassName}`)
     const indexOfSelectedDates = this.getSelectedIndex(dateValue)
 
     if (!options.multiple) {
-      if (targetSiblings) {
-        for (let i = 0; i < targetSiblings.length; i++) {
-          const element = targetSiblings[i]
+      if (days) {
+        for (let i = 0; i < days.length; i++) {
+          const element = days[i]
           if (element.classList.contains(options.classNames.selectedDayItemClassName)) {
             element.classList.remove(options.classNames.selectedDayItemClassName)
-          }
-        }
-      }
-
-      if (targetMonthWrapperSiblings) {
-        for (let i = 0; i < targetMonthWrapperSiblings.length; i++) {
-          const monthWrapper = targetMonthWrapperSiblings[i]
-
-          if (monthWrapper.classList.contains(options.classNames.monthWrapperClassName)) {
-            const days = monthWrapper.querySelectorAll(`.${options.classNames.dayItemClassName}`)
-
-            if (!days) {
-              return
-            }
-
-            for (let j = 0; j < days.length; j++) {
-              const day = days[j]
-
-              if (day.classList.contains(options.classNames.selectedDayItemClassName)) {
-                day.classList.remove(options.classNames.selectedDayItemClassName)
-              }
-            }
           }
         }
       }
@@ -416,35 +454,6 @@ class PrivateDatepicker {
     } else if (!options.multiple) {
       target.classList.add(options.classNames.selectedDayItemClassName)
     }
-
-    this.setValue(dateValue)
-
-    // if (options.mode === 'range') {
-    //   console.log(this.selectedDates)
-    // }
-
-    if (typeof options.onClick === 'function') {
-      this.handleOnClickEvent(this.selectedDates)
-    }
-
-    if (options.autoClose) {
-      this.close()
-    }
-  }
-
-  private onDayHover = (e: MouseEvent) => {
-    const { options } = this
-    const target: HTMLElement = e.target as HTMLElement
-    if (
-      !(
-        target.classList.contains(options.classNames.dayItemClassName) &&
-        target.getAttribute('data-date')
-      )
-    ) {
-      return
-    }
-
-    // console.log('target: ', target)
   }
 
   private handleOnClickEvent = (selectedDate: ISelectedDates) => {
@@ -564,7 +573,7 @@ class PrivateDatepicker {
     }
   }
 
-  private setValue = (dateValue: Moment | string) => {
+  private setValue = (dateValue: Moment | string, e?: MouseEvent) => {
     const { options } = this
     const momented = moment.isMoment(dateValue) ? dateValue : this.getMomented(dateValue)
     const indexOfSelectedDates = this.getSelectedIndex(dateValue)
@@ -593,6 +602,9 @@ class PrivateDatepicker {
       }
 
       this.setElemValue(momented.format(options.format))
+      if (e) {
+        this.handleDayState(e)
+      }
     }
   }
 

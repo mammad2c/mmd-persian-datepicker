@@ -3,61 +3,9 @@ import moment, { Moment } from 'moment-jalaali'
 // library imports
 import { constants } from './constants'
 import { siblings } from './utils/siblings'
+import { IElemPosition, IOptions, ISelectedDateItem, ISelectedDates } from './types'
 
-interface ISelectedDateItem {
-  ISO: string
-  timestamp: number
-  value: any
-}
-
-interface ISelectedDates extends Array<ISelectedDateItem> {}
-
-interface IElemPosition {
-  top: number
-  left: number
-}
-
-interface IOptions {
-  // configs
-  defaultValue: Date | string | boolean
-  autoClose: boolean
-  multiple: boolean
-  multipleSeparator: string
-  numberOfMonths: number
-  timeout: number
-  format: string
-  classNames: {
-    baseClassName: string
-    monthWrapperClassName: string
-    // headers class name:
-    headerClassName: string
-    arrowsClassName: string
-    arrowsRightClassName: string
-    arrowsLeftClassName: string
-    titleClassName: string
-    titleMonthClassName: string
-    titleYearClassName: string
-    // body class name:
-    bodyClassName: string
-    weeksClassName: string
-    weekItemClassName: string
-    daysClassName: string
-    dayItemClassName: string
-    selectedDayItemClassName: string
-    // footer class name:
-    footerClassName: string
-  }
-  arrows: {
-    left: string
-    right: string
-  }
-  weekName: Array<string>
-  monthNames: Array<string>
-  // events:
-  onClick?: (selectedDate: ISelectedDates, self: Datepicker) => void
-}
-
-const defaultOptionsValue: IOptions = {
+const defaultOptionsValue: IOptions<Datepicker> = {
   defaultValue: false,
   autoClose: false,
   multiple: false,
@@ -119,7 +67,7 @@ class Datepicker {
    * @param elem the element css selector
    * @param options Datepicker options
    */
-  constructor(elem: string, options?: IOptions) {
+  constructor(elem: string, options?: IOptions<Datepicker>) {
     const datepicker = new PrivateDatepicker(elem, this, options)
     this.getValue = datepicker.getValue
     this.open = datepicker.open
@@ -130,7 +78,7 @@ class Datepicker {
 class PrivateDatepicker {
   // constructor elements
   private elem: HTMLInputElement | HTMLElement
-  private options: IOptions
+  private options: IOptions<Datepicker>
   private pickerPrivater: Datepicker
 
   // rests
@@ -148,7 +96,7 @@ class PrivateDatepicker {
   private timeoutTemp?: any
   private isOpen: boolean
 
-  constructor(elem: string, pickerPrivater: Datepicker, options?: IOptions) {
+  constructor(elem: string, pickerPrivater: Datepicker, options?: IOptions<Datepicker>) {
     this.elemId = elem
     const elemExist = document.querySelector(elem) as HTMLInputElement
 

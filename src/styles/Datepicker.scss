@@ -42,6 +42,10 @@
     width: $pickerWidth;
   }
 
+  &__month-wrapper + &__month-wrapper {
+    margin-right: $multipleMonthGutter;
+  }
+
   &__header {
     display: flex;
     justify-content: center;

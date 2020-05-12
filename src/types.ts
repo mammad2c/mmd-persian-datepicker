@@ -15,6 +15,7 @@ export interface IOptions<T> {
   // configs
   defaultValue: Date | string | boolean
   autoClose: boolean
+  mode: 'single' | 'range'
   multiple: boolean
   multipleSeparator: string
   numberOfMonths: number

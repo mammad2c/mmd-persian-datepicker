@@ -9,6 +9,7 @@ const defaultOptionsValue: IOptions<Datepicker> = {
   defaultValue: false,
   autoClose: false,
   multiple: false,
+  mode: 'single',
   multipleSeparator: ' - ',
   numberOfMonths: 1,
   timeout: 250,
@@ -92,7 +93,6 @@ class PrivateDatepicker {
   private currentYear: number
   private currentMonth: number
   private selectedDates: ISelectedDates = []
-  private daysInCurrentMonth: number[] = []
   private timeoutTemp?: any
   private isOpen: boolean
 
@@ -105,6 +105,7 @@ class PrivateDatepicker {
     } else {
       this.elem = elemExist
     }
+
     this.options = Object.assign(defaultOptionsValue, options)
     this.pickerPrivater = pickerPrivater
     this.calendarElem = document.createElement('div')
@@ -158,11 +159,18 @@ class PrivateDatepicker {
     return this.selectedDates
   }
 
-  private calculateDaysInCurrentMonth = (): void => {
-    const totalDays = moment.jDaysInMonth(this.currentYear, this.currentMonth)
+  private calculateDaysInCurrentMonth = (additional: number = 0): number[] => {
+    const { currentYear, currentMonth } = this
+    const monthOverflow = this.isMonthOverflow(additional)
+    const month = monthOverflow ? 1 : currentMonth + additional
+    const year = monthOverflow ? currentYear + 1 : currentYear
+
+    const totalDays = moment.jDaysInMonth(year, month)
+    let daysInCurrentMonth = []
     for (let i = 1; i <= totalDays; i++) {
-      this.daysInCurrentMonth.push(i)
+      daysInCurrentMonth.push(i)
     }
+    return daysInCurrentMonth
   }
 
   private calculateFirstDayOfMonth = (additional: number = 0): string => {
@@ -182,8 +190,6 @@ class PrivateDatepicker {
     const { options } = this
     this.calendarElem.setAttribute('id', `${this.elem.getAttribute('id')}-calendar`)
     this.calendarElem.classList.add(options.classNames.baseClassName)
-
-    this.calculateDaysInCurrentMonth()
 
     // remove any previous data in calendar elem
     while (this.calendarElem.firstChild) {
@@ -267,7 +273,7 @@ class PrivateDatepicker {
   }
 
   private createBody = (additional: number = 0): HTMLElement => {
-    const { options, daysInCurrentMonth, currentYear, currentMonth, selectedDates } = this
+    const { options, currentYear, currentMonth, selectedDates } = this
     const body = document.createElement('div')
     const days = document.createElement('div')
     const weeks = document.createElement('div')
@@ -283,6 +289,8 @@ class PrivateDatepicker {
     for (let i = 0; i < offsetStartWeek; i++) {
       days.innerHTML += `<span class="${options.classNames.dayItemClassName} ${options.classNames.dayItemClassName}--disabled"></span>`
     }
+
+    const daysInCurrentMonth = this.calculateDaysInCurrentMonth(additional)
 
     for (let i = 1; i <= daysInCurrentMonth.length; i++) {
       const dateValue = `${year}/${month}/${i}`
@@ -390,7 +398,6 @@ class PrivateDatepicker {
     if (this.currentMonth === 0) {
       this.currentYear++
     }
-    this.daysInCurrentMonth = []
     this.createElement()
   }
 
@@ -399,7 +406,6 @@ class PrivateDatepicker {
     if (this.currentMonth === 11) {
       this.currentYear--
     }
-    this.daysInCurrentMonth = []
     this.createElement()
   }
 

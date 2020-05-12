@@ -117,16 +117,22 @@
     box-shadow: 0 0 2px $gray;
   }
 
-  &__day-item--in-range {
-    background-color: rgba($color: $blueLight, $alpha: 0.5);
-  }
-
   &__day-item--selected {
     background-color: $blueLight;
     color: #fff;
 
     &:hover {
       background-color: $blueLight;
+      color: #fff;
+    }
+  }
+
+  &__day-item--in-range {
+    background-color: rgba($color: $blueLight, $alpha: 0.5);
+    color: #fff;
+
+    &:hover {
+      background-color: rgba($color: $blueLight, $alpha: 0.5);
       color: #fff;
     }
   }

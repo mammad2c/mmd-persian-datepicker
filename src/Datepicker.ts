@@ -420,11 +420,52 @@ class PrivateDatepicker {
 
     if (!momented.isAfter(startDate.momented)) {
       this.setValue(momented, e)
+    } else {
+      const diff = momented.diff(startDate.momented, 'd')
+      let diffMomented = []
+
+      if (diff > 0) {
+        for (let i = 1; i <= diff; i++) {
+          diffMomented.push(startDate.momented.clone().add(i, 'd'))
+        }
+      }
+
+      if (!target.classList.contains(options.classNames.inRangeDayItemClassName)) {
+        target.classList.add(options.classNames.inRangeDayItemClassName)
+      }
+
+      if (!diffMomented.length) {
+        return
+      }
+
+      const daysElem = this.calendarElem.querySelectorAll(`.${options.classNames.dayItemClassName}`)
+
+      if (!daysElem) {
+        return
+      }
+
+      for (let i = 0; i < daysElem.length; i++) {
+        const dayElem = daysElem[i]
+
+        const dayElemDateValue = dayElem.getAttribute('data-date')
+        const dayMomented = this.getMomented(dayElemDateValue ? dayElemDateValue : '')
+
+        const isInRange = diffMomented.find((item) => item.isSame(dayMomented))
+
+        if (isInRange && !dayElem.classList.contains(options.classNames.inRangeDayItemClassName)) {
+          dayElem.classList.add(options.classNames.inRangeDayItemClassName)
+        } else if (
+          !isInRange &&
+          dayElem.classList.contains(options.classNames.inRangeDayItemClassName)
+        ) {
+          dayElem.classList.remove(options.classNames.inRangeDayItemClassName)
+        }
+      }
     }
   }
 
   private handleDayState = (e: MouseEvent) => {
-    const { options } = this
+    const { options, selectedDates } = this
     const target = this.getValidDayTarget(e)
 
     if (!target) {
@@ -435,13 +476,30 @@ class PrivateDatepicker {
     const dateValue = isDateValueNull ? isDateValueNull : ''
     const days = this.calendarElem.querySelectorAll(`.${options.classNames.dayItemClassName}`)
     const indexOfSelectedDates = this.getSelectedIndex(dateValue)
+    const startDate = selectedDates[0]
 
     if (!options.multiple) {
       if (days) {
         for (let i = 0; i < days.length; i++) {
-          const element = days[i]
-          if (element.classList.contains(options.classNames.selectedDayItemClassName)) {
-            element.classList.remove(options.classNames.selectedDayItemClassName)
+          const day = days[i]
+
+          if (day.classList.contains(options.classNames.selectedDayItemClassName)) {
+            day.classList.remove(options.classNames.selectedDayItemClassName)
+          }
+
+          if (options.mode === 'range' && startDate) {
+            const dayDateValue = day.getAttribute('data-date')
+
+            if (dayDateValue) {
+              const momented = this.getMomented(dayDateValue)
+              const nextStartDate = startDate.momented.clone().add('1', 'day')
+
+              if (nextStartDate.isSame(momented)) {
+                day.classList.add(options.classNames.inRangeDayItemClassName)
+              } else if (day.classList.contains(options.classNames.inRangeDayItemClassName)) {
+                day.classList.remove(options.classNames.inRangeDayItemClassName)
+              }
+            }
           }
         }
       }

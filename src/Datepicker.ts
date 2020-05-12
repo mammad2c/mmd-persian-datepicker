@@ -314,7 +314,18 @@ class PrivateDatepicker {
             : ''
       }
 
-      days.innerHTML += `<span data-date="${dateValue}" class="${options.classNames.dayItemClassName} ${todayClass} ${selectedDate}">${i}</span>`
+      const dayItem = document.createElement('span')
+      const dayItemText = document.createTextNode(`${i}`)
+
+      dayItem.className = `${options.classNames.dayItemClassName} ${todayClass} ${selectedDate}`
+      dayItem.dataset.date = dateValue
+      dayItem.appendChild(dayItemText)
+
+      if (options.mode === 'range') {
+        dayItem.addEventListener('mouseenter', this.onDayHover)
+      }
+
+      days.appendChild(dayItem)
     }
 
     weeks.classList.add(options.classNames.weeksClassName)
@@ -362,7 +373,7 @@ class PrivateDatepicker {
     const isDateValueNull = target.getAttribute('data-date')
     const dateValue = isDateValueNull ? isDateValueNull : ''
     const targetSiblings = siblings(target)
-    const targetParentSiblings = siblings(target.parentElement?.parentElement?.parentElement)
+    const targetMonthWrapperSiblings = siblings(target.parentElement?.parentElement?.parentElement)
     const indexOfSelectedDates = this.getSelectedIndex(dateValue)
 
     if (!options.multiple) {
@@ -375,17 +386,22 @@ class PrivateDatepicker {
         }
       }
 
-      if (targetParentSiblings) {
-        for (let i = 0; i < targetParentSiblings.length; i++) {
-          const monthWrapper = targetParentSiblings[i]
+      if (targetMonthWrapperSiblings) {
+        for (let i = 0; i < targetMonthWrapperSiblings.length; i++) {
+          const monthWrapper = targetMonthWrapperSiblings[i]
 
           if (monthWrapper.classList.contains(options.classNames.monthWrapperClassName)) {
-            const children = monthWrapper.children[1].children[1].children
-            for (let j = 0; j < children.length; j++) {
-              const element = children[j]
+            const days = monthWrapper.querySelectorAll(`.${options.classNames.dayItemClassName}`)
 
-              if (element.classList.contains(options.classNames.selectedDayItemClassName)) {
-                element.classList.remove(options.classNames.selectedDayItemClassName)
+            if (!days) {
+              return
+            }
+
+            for (let j = 0; j < days.length; j++) {
+              const day = days[j]
+
+              if (day.classList.contains(options.classNames.selectedDayItemClassName)) {
+                day.classList.remove(options.classNames.selectedDayItemClassName)
               }
             }
           }
@@ -427,6 +443,8 @@ class PrivateDatepicker {
     ) {
       return
     }
+
+    // console.log('target: ', target)
   }
 
   private handleOnClickEvent = (selectedDate: ISelectedDates) => {

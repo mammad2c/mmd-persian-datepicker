@@ -23,6 +23,8 @@ export interface IOptions<T> {
   multipleSeparator: string
   rangeSeparator: string
   numberOfMonths: number
+  minDate?: boolean | Moment | Date | string | null
+  maxDate?: boolean | Moment | Date | string | null
   timeout: number
   format: string
   classNames: {
@@ -45,6 +47,7 @@ export interface IOptions<T> {
     selectedDayItemClassName: string
     inRangeDayItemClassName: string
     todayClassName: string
+    disabledDayItemClassName: string
     // footer class name:
     footerClassName: string
   }

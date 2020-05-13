@@ -1,4 +1,4 @@
-import moment, { Moment } from 'moment-jalaali'
+import moment, { Moment, min } from 'moment-jalaali'
 
 // library imports
 import { constants } from './constants'
@@ -12,6 +12,8 @@ const defaultOptionsValue: IOptions<Datepicker> = {
   multipleSeparator: ' - ',
   rangeSeparator: ' الی ',
   numberOfMonths: 1,
+  minDate: new Date(),
+  maxDate: false,
   timeout: 250,
   format: 'jYYYY/jM/jD',
   classNames: {
@@ -34,6 +36,7 @@ const defaultOptionsValue: IOptions<Datepicker> = {
     selectedDayItemClassName: constants.selectedDayItemClassName,
     inRangeDayItemClassName: constants.inRangeDayItemClassName,
     todayClassName: constants.todayClassName,
+    disabledDayItemClassName: constants.disabledDayItemClassName,
     // footer class name:
     footerClassName: constants.footerClassName,
   },
@@ -89,7 +92,6 @@ class PrivateDatepicker {
   private elemPosition?: IElemPosition
   private calendarElem: HTMLElement
   private today: Moment
-  private todayDay: number
   private todayMonth: number
   private todayYear: number
   private currentYear: number
@@ -98,6 +100,7 @@ class PrivateDatepicker {
   private inRangeDates: Array<ISelectedDateItem['momented']> = ([] = [])
   private timeoutTemp?: any
   private isOpen: boolean
+  private minDate?: Moment
 
   constructor(elem: string, pickerPrivater: Datepicker, options?: IOptions<Datepicker>) {
     this.elemId = elem
@@ -113,7 +116,6 @@ class PrivateDatepicker {
     this.pickerPrivater = pickerPrivater
     this.calendarElem = document.createElement('div')
     this.today = moment(new Date())
-    this.todayDay = this.today.jDate()
     this.todayMonth = this.today.jMonth()
     this.todayYear = this.today.jYear()
     this.currentMonth = this.todayMonth
@@ -121,17 +123,27 @@ class PrivateDatepicker {
     this.isOpen = false
     this.handleClickOutside()
 
-    if (this.options.defaultValue) {
+    const { minDate, defaultValue, format } = this.options
+
+    if (defaultValue) {
       const momentedDefaultValue = this.getMomented(
-        moment(
-          typeof this.options.defaultValue === 'boolean' ? new Date() : this.options.defaultValue
-        ).format(this.options.format)
+        moment(typeof defaultValue === 'boolean' ? new Date() : defaultValue).format(format)
       )
 
       this.currentMonth = momentedDefaultValue.jMonth()
       this.currentYear = momentedDefaultValue.jYear()
 
       this.setValue(momentedDefaultValue)
+    }
+
+    if (minDate === true) {
+      this.minDate = moment(new Date())
+    } else if (minDate && minDate instanceof Date) {
+      this.minDate = moment(minDate)
+    } else if (minDate && !moment.isMoment(minDate)) {
+      this.minDate = moment(minDate, format)
+    } else {
+      this.minDate = undefined
     }
 
     this.createElement()
@@ -290,7 +302,7 @@ class PrivateDatepicker {
     days.classList.add(options.classNames.daysClassName)
 
     for (let i = 0; i < offsetStartWeek; i++) {
-      days.innerHTML += `<span class="${options.classNames.dayItemClassName} ${options.classNames.dayItemClassName}--disabled"></span>`
+      days.innerHTML += `<span class="${options.classNames.dayItemClassName} ${options.classNames.disabledDayItemClassName}"></span>`
     }
 
     const daysInCurrentMonth = this.calculateDaysInCurrentMonth(additional)
@@ -367,6 +379,10 @@ class PrivateDatepicker {
     const dateValue = isDateValueNull ? isDateValueNull : ''
     const momented = this.getMomented(dateValue)
 
+    if (this.minDate && momented.isBefore(this.minDate, 'd')) {
+      return
+    }
+
     this.inRangeDates = options.mode === 'range' ? [momented.clone().add(1, 'd')] : []
     this.setValue(momented)
 
@@ -395,6 +411,10 @@ class PrivateDatepicker {
 
     const momented = this.getMomented(dateValue)
 
+    if (this.minDate && momented.isBefore(this.minDate, 'd')) {
+      return
+    }
+
     const startDate = selectedDates[0]
     const endDate = selectedDates[1]
 
@@ -419,7 +439,7 @@ class PrivateDatepicker {
   }
 
   private handleDaysState = () => {
-    const { options, selectedDates } = this
+    const { options, selectedDates, minDate } = this
     const { classNames } = options
     const daysElem = this.calendarElem.querySelectorAll(`.${classNames.dayItemClassName}`)
     const startDate = selectedDates[0]
@@ -434,36 +454,41 @@ class PrivateDatepicker {
 
       if (dayDateValue) {
         const momented = this.getMomented(dayDateValue)
-        const foundedSelectedDate = this.findSelectedDate(momented)
 
-        if (momented.isSame(new Date(), 'd')) {
-          dayElem.classList.add(classNames.todayClassName)
-        } else if (dayElem.classList.contains(classNames.todayClassName)) {
-          dayElem.classList.remove(classNames.todayClassName)
-        }
+        if (minDate && momented.isBefore(minDate, 'd')) {
+          dayElem.classList.add(classNames.disabledDayItemClassName)
+        } else {
+          const foundedSelectedDate = this.findSelectedDate(momented)
 
-        if (
-          dayElem.classList.contains(classNames.selectedDayItemClassName) &&
-          !foundedSelectedDate
-        ) {
-          dayElem.classList.remove(classNames.selectedDayItemClassName)
-        } else if (foundedSelectedDate) {
-          dayElem.classList.add(classNames.selectedDayItemClassName)
-        }
+          if (momented.isSame(new Date(), 'd')) {
+            dayElem.classList.add(classNames.todayClassName)
+          } else if (dayElem.classList.contains(classNames.todayClassName)) {
+            dayElem.classList.remove(classNames.todayClassName)
+          }
 
-        if (options.multiple && foundedSelectedDate) {
-          dayElem.classList.add(classNames.selectedDayItemClassName)
-        } else if (options.multiple && !foundedSelectedDate) {
-          dayElem.classList.remove(classNames.selectedDayItemClassName)
-        }
+          if (
+            dayElem.classList.contains(classNames.selectedDayItemClassName) &&
+            !foundedSelectedDate
+          ) {
+            dayElem.classList.remove(classNames.selectedDayItemClassName)
+          } else if (foundedSelectedDate) {
+            dayElem.classList.add(classNames.selectedDayItemClassName)
+          }
 
-        if (options.mode === 'range' && startDate) {
-          const isInRange = this.findInRangeDate(momented)
+          if (options.multiple && foundedSelectedDate) {
+            dayElem.classList.add(classNames.selectedDayItemClassName)
+          } else if (options.multiple && !foundedSelectedDate) {
+            dayElem.classList.remove(classNames.selectedDayItemClassName)
+          }
 
-          if (isInRange) {
-            dayElem.classList.add(classNames.inRangeDayItemClassName)
-          } else {
-            dayElem.classList.remove(classNames.inRangeDayItemClassName)
+          if (options.mode === 'range' && startDate) {
+            const isInRange = this.findInRangeDate(momented)
+
+            if (isInRange) {
+              dayElem.classList.add(classNames.inRangeDayItemClassName)
+            } else {
+              dayElem.classList.remove(classNames.inRangeDayItemClassName)
+            }
           }
         }
       }

@@ -36,7 +36,7 @@ you have to installed [NodeJS v8](https://nodejs.org) up and recommended install
 - [ ] `enabledDates`: disable whole picker's dates except these dates.
 - [ ] `inline`: render picker like a normal calendar.
 - [ ] `maxDate`: maximum date user can select.
-- [ ] `minDate`: minimum date user can select.
+- [x] `minDate`: minimum date user can select.
 - [ ] `monthChanger`: enable selecting from months, also by set `false` could disable it.
 - [ ] `yearChanger`: enable selecting from years, also by set `false` could disable it.
 - [ ] `altInput`: alt input for actual sending data to server.

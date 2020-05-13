@@ -138,10 +138,12 @@
   }
 
   &__day-item--disabled {
+    opacity: 0.4;
     &:hover {
+      color: initial;
       background: transparent !important;
       box-shadow: none !important;
-      cursor: default !important;
+      cursor: not-allowed !important;
     }
   }
 }

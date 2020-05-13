@@ -20,6 +20,7 @@ export enum constants {
   selectedDayItemClassName = 'mmd-picker__day-item--selected',
   inRangeDayItemClassName = 'mmd-picker__day-item--in-range',
   todayClassName = 'mmd-picker__day-item--today',
+  disabledDayItemClassName = 'mmd-picker__day-item--disabled',
 
   // footer class name:
   footerClassName = 'mmd-picker__footer',

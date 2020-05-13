@@ -10,6 +10,7 @@ const defaultOptionsValue: IOptions<Datepicker> = {
   multiple: false,
   mode: 'single',
   multipleSeparator: ' - ',
+  rangeSeparator: ' الی ',
   numberOfMonths: 1,
   timeout: 250,
   format: 'jYYYY/jM/jD',
@@ -395,28 +396,24 @@ class PrivateDatepicker {
     const momented = this.getMomented(dateValue)
 
     const startDate = selectedDates[0]
+    const endDate = selectedDates[1]
 
-    if (!startDate) {
+    if (!startDate || endDate) {
       return
     }
 
-    if (!momented.isAfter(startDate.momented)) {
-      this.setValue(momented)
-      this.inRangeDates = [momented.clone().add(1, 'd')]
-    } else {
-      const diff = momented.diff(startDate.momented, 'd')
-      let diffMomented = []
+    const diff = momented.diff(startDate.momented, 'd')
+    let diffMomented = []
 
-      if (diff > 0) {
-        for (let i = 1; i <= diff; i++) {
-          const momentedDiff = startDate.momented.clone().add(i, 'd')
+    if (diff > 0) {
+      for (let i = 1; i <= diff; i++) {
+        const momentedDiff = startDate.momented.clone().add(i, 'd')
 
-          diffMomented.push(momentedDiff)
-        }
+        diffMomented.push(momentedDiff)
       }
-
-      this.inRangeDates = [...diffMomented]
     }
+
+    this.inRangeDates = [...diffMomented]
 
     this.handleDaysState()
   }
@@ -437,7 +434,7 @@ class PrivateDatepicker {
 
       if (dayDateValue) {
         const momented = this.getMomented(dayDateValue)
-        const indexOfSelectedDates = this.findSelectedDate(momented)
+        const foundedSelectedDate = this.findSelectedDate(momented)
 
         if (momented.isSame(new Date(), 'd')) {
           dayElem.classList.add(classNames.todayClassName)
@@ -445,16 +442,16 @@ class PrivateDatepicker {
 
         if (
           dayElem.classList.contains(classNames.selectedDayItemClassName) &&
-          !indexOfSelectedDates
+          !foundedSelectedDate
         ) {
           dayElem.classList.remove(classNames.selectedDayItemClassName)
-        } else if (indexOfSelectedDates) {
+        } else if (foundedSelectedDate) {
           dayElem.classList.add(classNames.selectedDayItemClassName)
         }
 
-        if (options.multiple && indexOfSelectedDates) {
+        if (options.multiple && foundedSelectedDate) {
           dayElem.classList.add(classNames.selectedDayItemClassName)
-        } else if (options.multiple && !indexOfSelectedDates) {
+        } else if (options.multiple && !foundedSelectedDate) {
           dayElem.classList.remove(classNames.selectedDayItemClassName)
         }
 
@@ -591,22 +588,77 @@ class PrivateDatepicker {
   private setValue = (dateValue: Moment | string) => {
     const { options } = this
     const momented = moment.isMoment(dateValue) ? dateValue : this.getMomented(dateValue)
-    const indexOfSelectedDates = this.findSelectedDate(dateValue)
+    const foundedSelectedDate = this.findSelectedDate(dateValue)
 
     if (options.multiple) {
-      if (!indexOfSelectedDates) {
+      if (!foundedSelectedDate) {
         this.selectedDates.push({
           ISO: momented.toISOString(),
           timestamp: momented.toDate().getTime(),
           value: momented.format(options.format),
           momented,
         })
-
         this.addElemValue(`${momented.format(options.format)}${options.multipleSeparator}`)
       } else {
         this.selectedDates = this.selectedDates.filter((item) => item.momented.isSame(momented))
-
         this.replaceElemValue(`${momented.format(options.format)}${options.multipleSeparator}`, '')
+      }
+    } else if (options.mode === 'range') {
+      const startDate = this.selectedDates[0]
+      const endDate = this.selectedDates[1]
+      if (
+        this.selectedDates.length === 0 ||
+        (foundedSelectedDate &&
+          foundedSelectedDate.momented.isSame(this.selectedDates[0].momented)) ||
+        (startDate && endDate)
+      ) {
+        const startDate = {
+          ISO: momented.toISOString(),
+          timestamp: momented.toDate().getTime(),
+          value: momented.format(options.format),
+          momented,
+        }
+
+        this.selectedDates = [startDate]
+
+        this.setElemValue(startDate.momented.format(options.format) + options.rangeSeparator)
+      } else if (!foundedSelectedDate && momented.isBefore(this.selectedDates[0].momented)) {
+        const startDate = {
+          ISO: momented.toISOString(),
+          timestamp: momented.toDate().getTime(),
+          value: momented.format(options.format),
+          momented,
+        }
+
+        this.selectedDates = [startDate]
+        this.inRangeDates = [startDate.momented.clone().add(1, 'd')]
+        this.setElemValue(startDate.momented.format(options.format) + options.rangeSeparator)
+      } else if (!foundedSelectedDate && momented.isAfter(this.selectedDates[0].momented)) {
+        const endDate = {
+          ISO: momented.toISOString(),
+          timestamp: momented.toDate().getTime(),
+          value: momented.format(options.format),
+          momented,
+        }
+
+        const diff = momented.diff(this.selectedDates[0].momented, 'd') - 1
+        let diffMomented = []
+
+        if (diff > 0) {
+          for (let i = 1; i <= diff; i++) {
+            const momentedDiff = this.selectedDates[0].momented.clone().add(i, 'd')
+
+            diffMomented.push(momentedDiff)
+          }
+        }
+
+        this.inRangeDates = [...diffMomented]
+        this.selectedDates = [this.selectedDates[0], endDate]
+        this.setElemValue(
+          this.selectedDates[0].momented.format(options.format) +
+            options.rangeSeparator +
+            endDate.momented.format(options.format)
+        )
       }
     } else {
       this.selectedDates[0] = {

@@ -21,6 +21,7 @@ export interface IOptions<T> {
   mode: 'single' | 'range'
   multiple: boolean
   multipleSeparator: string
+  rangeSeparator: string
   numberOfMonths: number
   timeout: number
   format: string

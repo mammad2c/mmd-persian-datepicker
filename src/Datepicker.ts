@@ -438,6 +438,8 @@ class PrivateDatepicker {
 
         if (momented.isSame(new Date(), 'd')) {
           dayElem.classList.add(classNames.todayClassName)
+        } else if (dayElem.classList.contains(classNames.todayClassName)) {
+          dayElem.classList.remove(classNames.todayClassName)
         }
 
         if (

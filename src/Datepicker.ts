@@ -1,8 +1,9 @@
-import moment, { Moment, min } from 'moment-jalaali'
+import moment, { Moment } from 'moment-jalaali'
 
 // library imports
-import { constants } from './constants'
+import { constants } from './configs/constants'
 import { IElemPosition, IOptions, ISelectedDates, ISelectedDateItem } from './types'
+import Day from './components/Day'
 
 const defaultOptionsValue: IOptions<Datepicker> = {
   defaultValue: false,
@@ -101,6 +102,7 @@ class PrivateDatepicker {
   private timeoutTemp?: any
   private isOpen: boolean
   private minDate?: Moment
+  private days: Array<Day> = []
 
   constructor(elem: string, pickerPrivater: Datepicker, options?: IOptions<Datepicker>) {
     this.elemId = elem
@@ -216,6 +218,7 @@ class PrivateDatepicker {
     this.calendarElem.appendChild(arrowRight)
     this.calendarElem.appendChild(arrowLeft)
 
+    this.days = []
     // append header and body for calendar
     for (let index = 0; index < options.numberOfMonths; index++) {
       const monthWrapper = this.createMonthWrapper()
@@ -309,18 +312,26 @@ class PrivateDatepicker {
 
     for (let i = 1; i <= daysInCurrentMonth.length; i++) {
       const dateValue = `${year}/${month}/${i}`
-      const dayItem = document.createElement('span')
-      const dayItemText = document.createTextNode(`${i}`)
+      const day = new Day({
+        date: moment(dateValue, 'jYYYY/jMM/jDD'),
+        today: this.today,
+        minDate: this.minDate,
+        setValue: this.setValue,
+        mode: options.mode,
+        selectedDates: this.selectedDates,
+        autoClose: options.autoClose,
+        close: this.close,
+        format: options.format,
+        inRangeDates: this.inRangeDates,
+        setInRangeDates: this.setInRangeDates,
+        multiple: options.multiple,
+        findSelectedDate: this.findSelectedDate,
+        findInRangeDate: this.findInRangeDate,
+        handleDaysState: this.handleDaysState,
+      })
 
-      dayItem.classList.add(options.classNames.dayItemClassName)
-      dayItem.dataset.date = dateValue
-      dayItem.appendChild(dayItemText)
-
-      if (options.mode === 'range') {
-        dayItem.addEventListener('mouseenter', this.onDayHover)
-      }
-
-      days.appendChild(dayItem)
+      days.appendChild(day.render())
+      this.days.push(day)
     }
 
     weeks.classList.add(options.classNames.weeksClassName)
@@ -331,7 +342,6 @@ class PrivateDatepicker {
 
     body.appendChild(weeks)
     body.appendChild(days)
-    body.addEventListener('click', this.onDayClick)
 
     return body
   }
@@ -438,60 +448,32 @@ class PrivateDatepicker {
     this.handleDaysState()
   }
 
+  private setInRangeDates = (value: Array<Moment>) => {
+    this.inRangeDates = value
+  }
+
   private handleDaysState = () => {
-    const { options, selectedDates, minDate } = this
-    const { classNames } = options
-    const daysElem = this.calendarElem.querySelectorAll(`.${classNames.dayItemClassName}`)
-    const startDate = selectedDates[0]
+    const { days, options } = this
 
-    if (!daysElem) {
-      return
-    }
-
-    for (let i = 0; i < daysElem.length; i++) {
-      const dayElem = daysElem[i]
-      const dayDateValue = dayElem.getAttribute('data-date')
-
-      if (dayDateValue) {
-        const momented = this.getMomented(dayDateValue)
-
-        if (minDate && momented.isBefore(minDate, 'd')) {
-          dayElem.classList.add(classNames.disabledDayItemClassName)
-        } else {
-          const foundedSelectedDate = this.findSelectedDate(momented)
-
-          if (momented.isSame(new Date(), 'd')) {
-            dayElem.classList.add(classNames.todayClassName)
-          } else if (dayElem.classList.contains(classNames.todayClassName)) {
-            dayElem.classList.remove(classNames.todayClassName)
-          }
-
-          if (
-            dayElem.classList.contains(classNames.selectedDayItemClassName) &&
-            !foundedSelectedDate
-          ) {
-            dayElem.classList.remove(classNames.selectedDayItemClassName)
-          } else if (foundedSelectedDate) {
-            dayElem.classList.add(classNames.selectedDayItemClassName)
-          }
-
-          if (options.multiple && foundedSelectedDate) {
-            dayElem.classList.add(classNames.selectedDayItemClassName)
-          } else if (options.multiple && !foundedSelectedDate) {
-            dayElem.classList.remove(classNames.selectedDayItemClassName)
-          }
-
-          if (options.mode === 'range' && startDate) {
-            const isInRange = this.findInRangeDate(momented)
-
-            if (isInRange) {
-              dayElem.classList.add(classNames.inRangeDayItemClassName)
-            } else {
-              dayElem.classList.remove(classNames.inRangeDayItemClassName)
-            }
-          }
-        }
-      }
+    for (let i = 0; i < days.length; i++) {
+      const day = days[i]
+      day.updateDayState({
+        date: day.getDate(),
+        today: this.today,
+        minDate: this.minDate,
+        setValue: this.setValue,
+        mode: options.mode,
+        selectedDates: this.selectedDates,
+        autoClose: options.autoClose,
+        close: this.close,
+        format: options.format,
+        inRangeDates: this.inRangeDates,
+        setInRangeDates: this.setInRangeDates,
+        multiple: options.multiple,
+        findSelectedDate: this.findSelectedDate,
+        findInRangeDate: this.findInRangeDate,
+        handleDaysState: this.handleDaysState,
+      })
     }
   }
 

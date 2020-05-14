@@ -14,11 +14,13 @@ export interface IElemPosition {
   left: number
 }
 
+export type mode = 'single' | 'range'
+
 export interface IOptions<T> {
   // configs
   defaultValue: Date | string | boolean
   autoClose: boolean
-  mode: 'single' | 'range'
+  mode: mode
   multiple: boolean
   multipleSeparator: string
   rangeSeparator: string

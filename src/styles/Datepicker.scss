@@ -127,10 +127,10 @@
   }
 
   &__day-item--in-range {
-    background-color: $blueLight;
+    background-color: rgba($color: $blue, $alpha: 0.3);
 
     &:hover {
-      background-color: $blueLight;
+      background-color: rgba($color: $blue, $alpha: 0.3);
     }
   }
 

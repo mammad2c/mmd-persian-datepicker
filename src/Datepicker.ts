@@ -4,6 +4,7 @@ import moment, { Moment } from 'moment-jalaali'
 import { constants } from './configs/constants'
 import { IElemPosition, IOptions, ISelectedDates, ISelectedDateItem } from './types'
 import Day from './components/Day'
+import { getValueObject } from './utils/getValueObject'
 
 const defaultOptionsValue: IOptions<Datepicker> = {
   defaultValue: false,
@@ -517,12 +518,7 @@ class PrivateDatepicker {
 
     if (options.multiple) {
       if (!foundedSelectedDate) {
-        this.selectedDates.push({
-          ISO: momented.toISOString(),
-          timestamp: momented.toDate().getTime(),
-          value: momented.format(options.format),
-          momented,
-        })
+        this.selectedDates.push(getValueObject(momented, options.format))
         this.addElemValue(`${momented.format(options.format)}${options.multipleSeparator}`)
       } else {
         this.selectedDates = this.selectedDates.filter((item) => item.momented.isSame(momented))
@@ -537,34 +533,19 @@ class PrivateDatepicker {
           foundedSelectedDate.momented.isSame(this.selectedDates[0].momented)) ||
         (startDate && endDate)
       ) {
-        const startDate = {
-          ISO: momented.toISOString(),
-          timestamp: momented.toDate().getTime(),
-          value: momented.format(options.format),
-          momented,
-        }
+        const startDate = getValueObject(momented, options.format)
 
         this.selectedDates = [startDate]
 
         this.setElemValue(startDate.momented.format(options.format) + options.rangeSeparator)
       } else if (!foundedSelectedDate && momented.isBefore(this.selectedDates[0].momented)) {
-        const startDate = {
-          ISO: momented.toISOString(),
-          timestamp: momented.toDate().getTime(),
-          value: momented.format(options.format),
-          momented,
-        }
+        const startDate = getValueObject(momented, options.format)
 
         this.selectedDates = [startDate]
         this.inRangeDates = [startDate.momented.clone().add(1, 'd')]
         this.setElemValue(startDate.momented.format(options.format) + options.rangeSeparator)
       } else if (!foundedSelectedDate && momented.isAfter(this.selectedDates[0].momented)) {
-        const endDate = {
-          ISO: momented.toISOString(),
-          timestamp: momented.toDate().getTime(),
-          value: momented.format(options.format),
-          momented,
-        }
+        const endDate = getValueObject(momented, options.format)
 
         const diff = momented.diff(this.selectedDates[0].momented, 'd') - 1
         let diffMomented = []
@@ -586,13 +567,7 @@ class PrivateDatepicker {
         )
       }
     } else {
-      this.selectedDates[0] = {
-        ISO: momented.toISOString(),
-        timestamp: momented.toDate().getTime(),
-        value: momented.format(options.format),
-        momented,
-      }
-
+      this.selectedDates[0] = getValueObject(momented, options.format)
       this.setElemValue(momented.format(options.format))
     }
 

@@ -70,6 +70,7 @@ class Datepicker {
   public getValue: () => ISelectedDates
   public open: () => void
   public close: () => void
+  public destroy: () => void
 
   /**
    * Datepicker constructor params:
@@ -81,6 +82,7 @@ class Datepicker {
     this.getValue = datepicker.getValue
     this.open = datepicker.open
     this.close = datepicker.close
+    this.destroy = datepicker.destroy
   }
 }
 
@@ -166,16 +168,16 @@ class PrivateDatepicker {
     }
 
     this.tempMaxDate = undefined
-
     this.createElement()
+    window.addEventListener('resize', this.handleResize)
+  }
 
-    window.addEventListener('resize', () => {
-      if (!this.isOpen) {
-        return
-      }
-      clearTimeout(this.timeoutTemp)
-      this.timeoutTemp = setTimeout(this.setPosition, this.options.timeout)
-    })
+  private handleResize = () => {
+    if (!this.isOpen) {
+      return
+    }
+    clearTimeout(this.timeoutTemp)
+    this.timeoutTemp = setTimeout(this.setPosition, this.options.timeout)
   }
 
   private calculateDaysInCurrentMonth = (additional: number = 0): number[] => {
@@ -499,12 +501,14 @@ class PrivateDatepicker {
       e.stopImmediatePropagation()
     })
 
-    document.addEventListener('click', (e) => {
-      if (e.target == this.elem) return
-      if (!(e.target == this.calendarElem)) {
-        this.close()
-      }
-    })
+    document.addEventListener('click', this.closeOnClickOutside)
+  }
+
+  private closeOnClickOutside = (e: MouseEvent) => {
+    if (e.target === this.elem) return
+    if (!(e.target === this.calendarElem)) {
+      this.close()
+    }
   }
 
   private setElemValue = (str: any): void => {
@@ -653,6 +657,13 @@ class PrivateDatepicker {
 
   public getValue = (): ISelectedDates => {
     return this.selectedDates
+  }
+
+  public destroy = (): void => {
+    window.removeEventListener('resize', this.handleResize)
+    document.removeEventListener('click', this.closeOnClickOutside)
+    this.elem.removeEventListener('click', this.open)
+    this.calendarElem.remove()
   }
 }
 

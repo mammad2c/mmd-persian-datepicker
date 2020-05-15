@@ -389,49 +389,6 @@ class PrivateDatepicker {
     }
   }
 
-  private onDayHover = (e: MouseEvent) => {
-    const { selectedDates } = this
-    const target = this.getValidDayTarget(e)
-
-    if (!target) {
-      return
-    }
-
-    const dateValue = target.dataset.date
-
-    if (!dateValue) {
-      return
-    }
-
-    const momented = this.getMomented(dateValue)
-
-    if (this.minDate && momented.isBefore(this.minDate, 'd')) {
-      return
-    }
-
-    const startDate = selectedDates[0]
-    const endDate = selectedDates[1]
-
-    if (!startDate || endDate) {
-      return
-    }
-
-    const diff = momented.diff(startDate.momented, 'd')
-    let diffMomented = []
-
-    if (diff > 0) {
-      for (let i = 1; i <= diff; i++) {
-        const momentedDiff = startDate.momented.clone().add(i, 'd')
-
-        diffMomented.push(momentedDiff)
-      }
-    }
-
-    this.inRangeDates = [...diffMomented]
-
-    this.handleDaysState()
-  }
-
   private setInRangeDates = (value: Array<Moment>) => {
     this.inRangeDates = value
   }

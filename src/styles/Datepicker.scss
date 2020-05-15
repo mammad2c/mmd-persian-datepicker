@@ -109,7 +109,6 @@
 
     &:hover {
       background-color: $gray;
-      color: #fff;
     }
   }
 
@@ -118,22 +117,20 @@
   }
 
   &__day-item--selected {
-    background-color: $blueLight;
+    background-color: $blue;
     color: #fff;
 
     &:hover {
-      background-color: $blueLight;
+      background-color: $blue;
       color: #fff;
     }
   }
 
   &__day-item--in-range {
-    background-color: rgba($color: $blueLight, $alpha: 0.5);
-    color: #fff;
+    background-color: $blueLight;
 
     &:hover {
-      background-color: rgba($color: $blueLight, $alpha: 0.5);
-      color: #fff;
+      background-color: $blueLight;
     }
   }
 

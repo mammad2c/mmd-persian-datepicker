@@ -5,6 +5,7 @@ import { constants } from './configs/constants'
 import { IElemPosition, IOptions, ISelectedDates, ISelectedDateItem, disabledDates } from './types'
 import Day from './components/Day'
 import { getValueObject } from './utils/getValueObject'
+import { getValidatedMoment } from './utils/getValidatedMoment'
 
 const defaultOptionsValue: IOptions<Datepicker> = {
   defaultValue: false,
@@ -71,6 +72,7 @@ class Datepicker {
   public open: () => void
   public close: () => void
   public destroy: () => void
+  public setDate: () => void
 
   /**
    * Datepicker constructor params:
@@ -83,6 +85,7 @@ class Datepicker {
     this.open = datepicker.open
     this.close = datepicker.close
     this.destroy = datepicker.destroy
+    this.setDate = datepicker.setDate
   }
 }
 
@@ -367,21 +370,6 @@ class PrivateDatepicker {
     this.createElement()
   }
 
-  private getValidDayTarget = (e: MouseEvent): HTMLElement | null => {
-    const { options } = this
-    const target: HTMLElement = e.target as HTMLElement
-    if (
-      !(
-        target.classList.contains(options.classNames.dayItemClassName) &&
-        target.getAttribute('data-date')
-      )
-    ) {
-      return null
-    }
-
-    return target
-  }
-
   private onDayClick = () => {
     const { options } = this
 
@@ -511,41 +499,18 @@ class PrivateDatepicker {
     }
   }
 
-  private setElemValue = (str: any): void => {
-    if (this.elem instanceof HTMLInputElement) {
-      this.elem.value = str
-    } else {
-      this.elem.innerHTML = str
-    }
-  }
-
-  private replaceElemValue = (search: string, replace: string): void => {
-    if (this.elem instanceof HTMLInputElement) {
-      this.elem.value = this.elem.value.replace(search, replace)
-    } else {
-      this.elem.innerHTML = this.elem.innerHTML.replace(search, replace)
-    }
-  }
-
-  private addElemValue = (str: string): void => {
-    if (this.elem instanceof HTMLInputElement) {
-      this.elem.value += str
-    } else {
-      this.elem.innerHTML += str
-    }
-  }
-
-  private setValue = (dateValue?: Moment | string) => {
+  public setValue = (dateValue?: Moment | Date | string) => {
     const { options } = this
 
-    if (!dateValue) {
+    const momented = getValidatedMoment(dateValue, options.format)
+
+    if (!momented || !dateValue) {
       this.selectedDates = []
       this.setElemValue('')
       return
     }
 
-    const momented = moment.isMoment(dateValue) ? dateValue : this.getMomented(dateValue)
-    const foundedSelectedDate = this.findSelectedDate(dateValue)
+    const foundedSelectedDate = this.findSelectedDate(momented)
 
     if (options.multiple) {
       if (!foundedSelectedDate) {
@@ -599,6 +564,30 @@ class PrivateDatepicker {
     }
 
     this.handleDaysState()
+  }
+
+  private setElemValue = (str: any): void => {
+    if (this.elem instanceof HTMLInputElement) {
+      this.elem.value = str
+    } else {
+      this.elem.innerHTML = str
+    }
+  }
+
+  private replaceElemValue = (search: string, replace: string): void => {
+    if (this.elem instanceof HTMLInputElement) {
+      this.elem.value = this.elem.value.replace(search, replace)
+    } else {
+      this.elem.innerHTML = this.elem.innerHTML.replace(search, replace)
+    }
+  }
+
+  private addElemValue = (str: string): void => {
+    if (this.elem instanceof HTMLInputElement) {
+      this.elem.value += str
+    } else {
+      this.elem.innerHTML += str
+    }
   }
 
   private findSelectedDate = (dateValue: Moment | string): ISelectedDateItem | undefined => {
@@ -682,6 +671,20 @@ class PrivateDatepicker {
     document.removeEventListener('click', this.closeOnClickOutside)
     this.elem.removeEventListener('click', this.open)
     this.calendarElem.remove()
+  }
+
+  public setDate = (dateValue?: Moment | Date | string): void => {
+    const { format } = this.options
+    const momented = getValidatedMoment(dateValue, format)
+
+    if (!momented) {
+      throw new Error('Please provide valid date')
+    }
+
+    this.currentMonth = momented.jMonth()
+    this.currentYear = momented.jYear()
+    this.setValue(momented)
+    this.createElement()
   }
 }
 

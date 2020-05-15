@@ -58,5 +58,5 @@ you have to installed [NodeJS v8](https://nodejs.org) up and recommended install
 
 - [x] `destroy`: destroy instance, remove addEventListeners and ... for nothing exists about the picker. this feature enable using this library in SPA frameworks such as `react`, `vue` and ... .
 - [ ] `jumpToDate`: move picker to specific date.
-- [ ] `setDate`: set picker selected date(s) programmatically.
+- [x] `setDate`: set picker selected date(s) programmatically.
 - [ ] `toggle`: toggle between `open` and `close` of picker.

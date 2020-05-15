@@ -7,26 +7,27 @@ interface IDay {
   date: Moment
   selectedDates: ISelectedDates
   minDate?: Moment
+  maxDate?: Moment
   onClick?: (params: ISelectedDateItem) => void
   today: Moment
   isDisabled?: boolean
   setValue: (dateValue: string | moment.Moment) => void
   setInRangeDates: (value: Array<Moment>) => void
   mode: mode
-  autoClose: boolean
   format: string
   multiple: boolean
   findSelectedDate: (dateValue: Moment | string) => ISelectedDateItem | undefined
   findInRangeDate: (dateValue: Moment | string) => ISelectedDateItem['momented'] | undefined
   handleDaysState: () => void
   disabledDates: Array<Moment>
+  setMaxDate: (value: Moment | undefined) => void
 }
 
 interface IDayUpdate {
   selectedDates: IDay['selectedDates']
   minDate: IDay['minDate']
+  maxDate: IDay['maxDate']
   mode: IDay['mode']
-  autoClose: IDay['autoClose']
   isDisabled?: IDay['isDisabled']
   format: IDay['format']
   multiple: IDay['multiple']
@@ -41,8 +42,8 @@ class Day {
   private mode: IDay['mode']
   private selectedDates: IDay['selectedDates']
   private minDate: IDay['minDate']
+  private maxDate: IDay['maxDate']
   private setValue: IDay['setValue']
-  private autoClose: IDay['autoClose']
   private format: IDay['format']
   private setInRangeDates: IDay['setInRangeDates']
   private dayElem: HTMLSpanElement
@@ -51,17 +52,18 @@ class Day {
   private findInRangeDate: IDay['findInRangeDate']
   private handleDaysState: IDay['handleDaysState']
   private disabledDates: IDay['disabledDates']
+  private setMaxDate: IDay['setMaxDate']
 
   constructor({
     date,
     onClick,
     minDate,
+    maxDate,
     today,
     isDisabled,
     mode,
     selectedDates,
     setValue,
-    autoClose,
     format,
     setInRangeDates,
     multiple,
@@ -69,15 +71,16 @@ class Day {
     findInRangeDate,
     handleDaysState,
     disabledDates,
+    setMaxDate,
   }: IDay) {
     this.date = date
     this.onClick = onClick
     this.today = today
     this.mode = mode
     this.minDate = minDate
+    this.maxDate = maxDate
     this.selectedDates = selectedDates
     this.setValue = setValue
-    this.autoClose = autoClose
     this.format = format
     this.setInRangeDates = setInRangeDates
     this.dayElem = document.createElement('span')
@@ -88,6 +91,7 @@ class Day {
     this.isDisabled = isDisabled
     this.handleDisable()
     this.disabledDates = disabledDates
+    this.setMaxDate = setMaxDate
   }
 
   private handleOnDayClick = () => {
@@ -97,11 +101,7 @@ class Day {
       return
     }
 
-    const { date, minDate, setValue, mode, onClick, autoClose, format, setInRangeDates } = this
-
-    if (minDate && date.isBefore(minDate, 'd')) {
-      return
-    }
+    const { date, setValue, mode, onClick, format, setInRangeDates } = this
 
     if (mode === 'range') [setInRangeDates([date.clone().add(1, 'd')])]
     else {
@@ -122,12 +122,7 @@ class Day {
       return
     }
 
-    const { selectedDates, date, minDate, setInRangeDates, handleDaysState } = this
-
-    if (minDate && date.isBefore(this.minDate, 'd')) {
-      return
-    }
-
+    const { selectedDates, date, setInRangeDates, handleDaysState } = this
     const startDate = selectedDates[0]
     const endDate = selectedDates[1]
 
@@ -141,7 +136,6 @@ class Day {
     if (diff > 0) {
       for (let i = 1; i <= diff; i++) {
         const momentedDiff = startDate.momented.clone().add(i, 'd')
-
         diffMomented.push(momentedDiff)
       }
     }
@@ -151,21 +145,27 @@ class Day {
   }
 
   private handleDisable = () => {
-    const { isDisabled, minDate, date } = this
+    const { isDisabled, minDate, maxDate, date } = this
     if (isDisabled || this.isInDisabledDates()) {
       this.isDisabled = true
     } else if (minDate && date.isBefore(minDate, 'd')) {
+      this.isDisabled = true
+    } else if (maxDate && date.isAfter(maxDate, 'd')) {
       this.isDisabled = true
     } else {
       this.isDisabled = false
     }
   }
 
-  private isInDisabledDates = (): boolean => {
+  private isInDisabledDates = (value?: Moment): boolean => {
     const { disabledDates, date } = this
 
     if (!disabledDates) {
       return false
+    }
+
+    if (value) {
+      return !!disabledDates.find((item) => date.isSame(value, 'd'))
     }
 
     return !!disabledDates.find((item) => date.isSame(item, 'd'))
@@ -180,14 +180,12 @@ class Day {
     mode,
     selectedDates,
     isDisabled,
-    autoClose,
     format,
     multiple,
   }: IDayUpdate) => {
     this.mode = mode
     this.minDate = minDate
     this.selectedDates = selectedDates
-    this.autoClose = autoClose
     this.format = format
     this.multiple = multiple
     this.isDisabled = isDisabled

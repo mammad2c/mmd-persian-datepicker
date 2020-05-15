@@ -104,6 +104,7 @@ class PrivateDatepicker {
   private timeoutTemp?: any
   private isOpen: boolean
   private minDate?: Moment
+  private maxDate?: Moment
   private days: Array<Day> = []
   private disabledDates: Array<Moment>
 
@@ -130,7 +131,7 @@ class PrivateDatepicker {
     this.handleClickOutside()
     this.validateDisabledDates()
 
-    const { minDate, defaultValue, format } = this.options
+    const { minDate, defaultValue, format, maxDate } = this.options
 
     if (defaultValue) {
       const momentedDefaultValue = this.getMomented(
@@ -151,6 +152,16 @@ class PrivateDatepicker {
       this.minDate = moment(minDate, format)
     } else {
       this.minDate = undefined
+    }
+
+    if (maxDate === true) {
+      this.maxDate = moment(new Date())
+    } else if (maxDate && maxDate instanceof Date) {
+      this.maxDate = moment(maxDate)
+    } else if (maxDate && !moment.isMoment(maxDate)) {
+      this.maxDate = moment(maxDate, format)
+    } else {
+      this.maxDate = undefined
     }
 
     this.createElement()
@@ -304,11 +315,11 @@ class PrivateDatepicker {
         date: moment(dateValue, 'jYYYY/jMM/jDD'),
         today: this.today,
         minDate: this.minDate,
+        maxDate: this.maxDate,
         setValue: this.setValue,
         onClick: this.onDayClick,
         mode: options.mode,
         selectedDates: this.selectedDates,
-        autoClose: options.autoClose,
         format: options.format,
         setInRangeDates: this.setInRangeDates,
         multiple: options.multiple,
@@ -316,6 +327,7 @@ class PrivateDatepicker {
         findInRangeDate: this.findInRangeDate,
         handleDaysState: this.handleDaysState,
         disabledDates: this.disabledDates,
+        setMaxDate: this.setMaxDate,
       })
 
       days.appendChild(day.render())
@@ -389,9 +401,9 @@ class PrivateDatepicker {
       const day = days[i]
       day.updateDayState({
         minDate: this.minDate,
+        maxDate: this.maxDate,
         mode: options.mode,
         selectedDates: this.selectedDates,
-        autoClose: options.autoClose,
         format: options.format,
         multiple: options.multiple,
         disabledDates: this.disabledDates,
@@ -621,6 +633,10 @@ class PrivateDatepicker {
         return item
       }
     })
+  }
+
+  private setMaxDate = (value: Moment | undefined) => {
+    this.maxDate = value
   }
 
   public open = (): void => {

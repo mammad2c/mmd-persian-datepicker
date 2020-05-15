@@ -32,10 +32,10 @@ you have to installed [NodeJS v8](https://nodejs.org) up and recommended install
 - [x] `defaultValue`: initial value, should be today by default on initial render.
 - [x] `numberOfMonths`: how many months should be rendered.
 - [x] `rangeSelector`: enable selecting range of dates.
-- [ ] `disabledDates`: disable only some dates.
+- [x] `disabledDates`: disable only some dates.
 - [ ] `enabledDates`: disable whole picker's dates except these dates.
 - [ ] `inline`: render picker like a normal calendar.
-- [ ] `maxDate`: maximum date user can select.
+- [x] `maxDate`: maximum date user can select.
 - [x] `minDate`: minimum date user can select.
 - [ ] `monthChanger`: enable selecting from months, also by set `false` could disable it.
 - [ ] `yearChanger`: enable selecting from years, also by set `false` could disable it.

@@ -12,7 +12,7 @@ const defaultOptionsValue: IOptions<Datepicker> = {
   multiple: false,
   mode: 'single',
   multipleSeparator: ' - ',
-  rangeSeparator: ' الی ',
+  rangeSeparator: ' - ',
   numberOfMonths: 1,
   minDate: new Date(),
   maxDate: false,
@@ -105,6 +105,7 @@ class PrivateDatepicker {
   private isOpen: boolean
   private minDate?: Moment
   private maxDate?: Moment
+  private tempMaxDate?: Moment
   private days: Array<Day> = []
   private disabledDates: Array<Moment>
 
@@ -163,6 +164,8 @@ class PrivateDatepicker {
     } else {
       this.maxDate = undefined
     }
+
+    this.tempMaxDate = undefined
 
     this.createElement()
 
@@ -315,7 +318,7 @@ class PrivateDatepicker {
         date: moment(dateValue, 'jYYYY/jMM/jDD'),
         today: this.today,
         minDate: this.minDate,
-        maxDate: this.maxDate,
+        maxDate: this.tempMaxDate || this.maxDate,
         setValue: this.setValue,
         onClick: this.onDayClick,
         mode: options.mode,
@@ -327,7 +330,7 @@ class PrivateDatepicker {
         findInRangeDate: this.findInRangeDate,
         handleDaysState: this.handleDaysState,
         disabledDates: this.disabledDates,
-        setMaxDate: this.setMaxDate,
+        setTempMaxDate: this.setTempMaxDate,
       })
 
       days.appendChild(day.render())
@@ -401,7 +404,7 @@ class PrivateDatepicker {
       const day = days[i]
       day.updateDayState({
         minDate: this.minDate,
-        maxDate: this.maxDate,
+        maxDate: this.tempMaxDate || this.maxDate,
         mode: options.mode,
         selectedDates: this.selectedDates,
         format: options.format,
@@ -551,26 +554,22 @@ class PrivateDatepicker {
         (startDate && endDate)
       ) {
         const startDate = getValueObject(momented, options.format)
-
         this.selectedDates = [startDate]
-
         this.setElemValue(startDate.momented.format(options.format) + options.rangeSeparator)
       } else if (!foundedSelectedDate && momented.isBefore(this.selectedDates[0].momented)) {
         const startDate = getValueObject(momented, options.format)
-
         this.selectedDates = [startDate]
         this.inRangeDates = [startDate.momented.clone().add(1, 'd')]
         this.setElemValue(startDate.momented.format(options.format) + options.rangeSeparator)
       } else if (!foundedSelectedDate && momented.isAfter(this.selectedDates[0].momented)) {
         const endDate = getValueObject(momented, options.format)
-
         const diff = momented.diff(this.selectedDates[0].momented, 'd') - 1
         let diffMomented = []
+        this.setTempMaxDate(undefined)
 
         if (diff > 0) {
           for (let i = 1; i <= diff; i++) {
             const momentedDiff = this.selectedDates[0].momented.clone().add(i, 'd')
-
             diffMomented.push(momentedDiff)
           }
         }
@@ -635,8 +634,8 @@ class PrivateDatepicker {
     })
   }
 
-  private setMaxDate = (value: Moment | undefined) => {
-    this.maxDate = value
+  private setTempMaxDate = (value: Moment | undefined) => {
+    this.tempMaxDate = value
   }
 
   public open = (): void => {

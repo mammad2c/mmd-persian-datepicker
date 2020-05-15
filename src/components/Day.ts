@@ -20,7 +20,7 @@ interface IDay {
   findInRangeDate: (dateValue: Moment | string) => ISelectedDateItem['momented'] | undefined
   handleDaysState: () => void
   disabledDates: Array<Moment>
-  setMaxDate: (value: Moment | undefined) => void
+  setTempMaxDate: (value: Moment | undefined) => void
 }
 
 interface IDayUpdate {
@@ -52,7 +52,7 @@ class Day {
   private findInRangeDate: IDay['findInRangeDate']
   private handleDaysState: IDay['handleDaysState']
   private disabledDates: IDay['disabledDates']
-  private setMaxDate: IDay['setMaxDate']
+  private setTempMaxDate: IDay['setTempMaxDate']
 
   constructor({
     date,
@@ -71,7 +71,7 @@ class Day {
     findInRangeDate,
     handleDaysState,
     disabledDates,
-    setMaxDate,
+    setTempMaxDate,
   }: IDay) {
     this.date = date
     this.onClick = onClick
@@ -91,7 +91,7 @@ class Day {
     this.isDisabled = isDisabled
     this.handleDisable()
     this.disabledDates = disabledDates
-    this.setMaxDate = setMaxDate
+    this.setTempMaxDate = setTempMaxDate
   }
 
   private handleOnDayClick = () => {
@@ -101,10 +101,29 @@ class Day {
       return
     }
 
-    const { date, setValue, mode, onClick, format, setInRangeDates } = this
+    const { date, setValue, mode, onClick, format, setInRangeDates, disabledDates, maxDate } = this
 
-    if (mode === 'range') [setInRangeDates([date.clone().add(1, 'd')])]
-    else {
+    if (mode === 'range') {
+      setInRangeDates([date.clone().add(1, 'd')])
+
+      if (disabledDates && disabledDates.length !== 0) {
+        let tempMaxDate: Moment | undefined = undefined
+        let j = 0
+
+        while (!tempMaxDate && j < disabledDates.length) {
+          const disabledDate = disabledDates[j]
+          if (disabledDate.isAfter(date)) {
+            tempMaxDate = disabledDate.clone().subtract(1, 'd')
+          }
+          j += 1
+        }
+
+        if (tempMaxDate) {
+          this.setTempMaxDate(tempMaxDate)
+          this.handleDaysState()
+        }
+      }
+    } else {
       setInRangeDates([])
     }
 
@@ -122,7 +141,7 @@ class Day {
       return
     }
 
-    const { selectedDates, date, setInRangeDates, handleDaysState } = this
+    const { selectedDates, date, setInRangeDates, handleDaysState, disabledDates } = this
     const startDate = selectedDates[0]
     const endDate = selectedDates[1]
 
@@ -132,12 +151,29 @@ class Day {
 
     const diff = date.diff(startDate.momented, 'd')
     let diffMomented = []
+    let maxDate: Moment | undefined = undefined
 
     if (diff > 0) {
       for (let i = 1; i <= diff; i++) {
         const momentedDiff = startDate.momented.clone().add(i, 'd')
+
+        if (disabledDates && disabledDates.length !== 0) {
+          let j = 0
+          while (!maxDate && j < disabledDates.length) {
+            const disabledDate = disabledDates[j]
+            if (disabledDate.isAfter(momentedDiff)) {
+              maxDate = disabledDate.clone().subtract(1, 'd')
+            }
+            j += 1
+          }
+        }
+
         diffMomented.push(momentedDiff)
       }
+    }
+
+    if (maxDate) {
+      this.setTempMaxDate(maxDate)
     }
 
     setInRangeDates([...diffMomented])
@@ -171,32 +207,18 @@ class Day {
     return !!disabledDates.find((item) => date.isSame(item, 'd'))
   }
 
-  public getDate = () => {
-    return this.date
-  }
-
-  public updateDayState = ({
-    minDate,
-    mode,
-    selectedDates,
-    isDisabled,
-    format,
-    multiple,
-  }: IDayUpdate) => {
-    this.mode = mode
-    this.minDate = minDate
-    this.selectedDates = selectedDates
-    this.format = format
-    this.multiple = multiple
-    this.isDisabled = isDisabled
-    const { dayElem, date } = this
+  private handleClassNames = () => {
+    const { dayElem, date, selectedDates, mode } = this
+    dayElem.classList.add(constants.dayItemClassName)
     const startDate = selectedDates[0]
-    this.handleDisable()
 
     if (this.isDisabled) {
       dayElem.classList.add(constants.disabledDayItemClassName)
+      dayElem.classList.remove(constants.selectedDayItemClassName)
+      dayElem.classList.remove(constants.inRangeDayItemClassName)
     } else {
       const foundedSelectedDate = this.findSelectedDate(date)
+      dayElem.classList.remove(constants.disabledDayItemClassName)
 
       if (date.isSame(new Date(), 'd')) {
         dayElem.classList.add(constants.todayClassName)
@@ -218,7 +240,6 @@ class Day {
 
       if (mode === 'range' && startDate) {
         const isInRange = this.findInRangeDate(date)
-
         if (isInRange) {
           dayElem.classList.add(constants.inRangeDayItemClassName)
         } else {
@@ -228,31 +249,57 @@ class Day {
     }
   }
 
-  public render() {
-    const { today, date, isDisabled, mode, dayElem } = this
-    const dayElemText = document.createTextNode(`${date.jDate()}`)
-    dayElem.appendChild(dayElemText)
-    dayElem.classList.add(constants.dayItemClassName)
-
-    if (today.isSame(date, 'd')) {
-      dayElem.classList.add(constants.todayClassName)
-    } else if (dayElem.classList.contains(constants.todayClassName)) {
-      dayElem.classList.remove(constants.todayClassName)
-    }
+  private handleListeners = () => {
+    const { isDisabled, dayElem, mode } = this
 
     if (isDisabled) {
-      dayElem.classList.add(constants.disabledDayItemClassName)
-    } else if (dayElem.classList.contains(constants.disabledDayItemClassName)) {
-      dayElem.classList.remove(constants.disabledDayItemClassName)
-    }
+      dayElem.removeEventListener('click', this.handleOnDayClick)
 
-    if (!isDisabled) {
+      if (mode === 'range') {
+        dayElem.removeEventListener('mouseenter', this.handleOnDayHover)
+      }
+    } else {
       dayElem.addEventListener('click', this.handleOnDayClick)
 
       if (mode === 'range') {
         dayElem.addEventListener('mouseenter', this.handleOnDayHover)
       }
     }
+  }
+
+  public getDate = () => {
+    return this.date
+  }
+
+  public updateDayState = ({
+    minDate,
+    maxDate,
+    mode,
+    selectedDates,
+    isDisabled,
+    format,
+    multiple,
+  }: IDayUpdate) => {
+    this.mode = mode
+    this.minDate = minDate
+    this.selectedDates = selectedDates
+    this.maxDate = maxDate
+    this.format = format
+    this.multiple = multiple
+    this.isDisabled = isDisabled
+    this.handleDisable()
+    this.handleClassNames()
+    this.handleListeners()
+  }
+
+  public render() {
+    const { date, dayElem } = this
+    const dayElemText = document.createTextNode(`${date.jDate()}`)
+
+    dayElem.appendChild(dayElemText)
+    this.handleDisable()
+    this.handleClassNames()
+    this.handleListeners()
 
     return dayElem
   }

@@ -3,7 +3,7 @@
   display: none;
   visibility: hidden;
   opacity: 0;
-  transition: all 0.3s;
+  transition: all 0.15s ease;
   background: $mmdBackground;
   box-shadow: 0 1px 7px rgba($color: #000000, $alpha: 0.1);
   border-radius: 4px;

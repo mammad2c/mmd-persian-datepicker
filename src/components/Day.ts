@@ -11,8 +11,7 @@ interface IDay {
   today: Moment
   isDisabled?: boolean
   setValue: (dateValue: string | moment.Moment) => void
-  inRangeDates: Array<Moment>
-  setInRangeDates: (value: IDay['inRangeDates']) => void
+  setInRangeDates: (value: Array<Moment>) => void
   mode: mode
   autoClose: boolean
   format: string
@@ -25,16 +24,16 @@ interface IDay {
 interface IDayUpdate {
   selectedDates: IDay['selectedDates']
   minDate: IDay['minDate']
-  inRangeDates: IDay['inRangeDates']
   mode: IDay['mode']
   autoClose: IDay['autoClose']
+  isDisabled?: IDay['isDisabled']
   format: IDay['format']
   multiple: IDay['multiple']
 }
 
 class Day {
   private date: IDay['date']
-  private isDisabled: boolean
+  private isDisabled?: boolean
   private onClick?: IDay['onClick']
   private today: IDay['today']
   private mode: IDay['mode']
@@ -43,7 +42,6 @@ class Day {
   private setValue: IDay['setValue']
   private autoClose: IDay['autoClose']
   private format: IDay['format']
-  private inRangeDates: IDay['inRangeDates']
   private setInRangeDates: IDay['setInRangeDates']
   private dayElem: HTMLSpanElement
   private multiple: IDay['multiple']
@@ -62,7 +60,6 @@ class Day {
     setValue,
     autoClose,
     format,
-    inRangeDates,
     setInRangeDates,
     multiple,
     findSelectedDate,
@@ -78,21 +75,14 @@ class Day {
     this.setValue = setValue
     this.autoClose = autoClose
     this.format = format
-    this.inRangeDates = inRangeDates
     this.setInRangeDates = setInRangeDates
     this.dayElem = document.createElement('span')
     this.multiple = multiple
     this.findSelectedDate = findSelectedDate
     this.findInRangeDate = findInRangeDate
     this.handleDaysState = handleDaysState
-
-    if (isDisabled) {
-      this.isDisabled = true
-    } else if (minDate && date.isBefore(minDate, 'd')) {
-      this.isDisabled = true
-    } else {
-      this.isDisabled = false
-    }
+    this.isDisabled = isDisabled
+    this.handleDisable()
   }
 
   private handleOnDayClick = () => {
@@ -155,6 +145,17 @@ class Day {
     handleDaysState()
   }
 
+  private handleDisable = () => {
+    const { isDisabled, minDate, date } = this
+    if (isDisabled) {
+      this.isDisabled = true
+    } else if (minDate && date.isBefore(minDate, 'd')) {
+      this.isDisabled = true
+    } else {
+      this.isDisabled = false
+    }
+  }
+
   public getDate = () => {
     return this.date
   }
@@ -163,9 +164,9 @@ class Day {
     minDate,
     mode,
     selectedDates,
+    isDisabled,
     autoClose,
     format,
-    inRangeDates,
     multiple,
   }: IDayUpdate) => {
     this.mode = mode
@@ -173,13 +174,13 @@ class Day {
     this.selectedDates = selectedDates
     this.autoClose = autoClose
     this.format = format
-    this.inRangeDates = inRangeDates
     this.multiple = multiple
-
+    this.isDisabled = isDisabled
     const { dayElem, date } = this
     const startDate = selectedDates[0]
+    this.handleDisable()
 
-    if (minDate && date.isBefore(minDate, 'd')) {
+    if (this.isDisabled) {
       dayElem.classList.add(constants.disabledDayItemClassName)
     } else {
       const foundedSelectedDate = this.findSelectedDate(date)
@@ -216,7 +217,6 @@ class Day {
 
   public render() {
     const { today, date, isDisabled, mode, dayElem } = this
-
     const dayElemText = document.createTextNode(`${date.jDate()}`)
     dayElem.appendChild(dayElemText)
     dayElem.classList.add(constants.dayItemClassName)

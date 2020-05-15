@@ -306,7 +306,6 @@ class PrivateDatepicker {
         selectedDates: this.selectedDates,
         autoClose: options.autoClose,
         format: options.format,
-        inRangeDates: this.inRangeDates,
         setInRangeDates: this.setInRangeDates,
         multiple: options.multiple,
         findSelectedDate: this.findSelectedDate,
@@ -388,7 +387,6 @@ class PrivateDatepicker {
         selectedDates: this.selectedDates,
         autoClose: options.autoClose,
         format: options.format,
-        inRangeDates: this.inRangeDates,
         multiple: options.multiple,
       })
     }

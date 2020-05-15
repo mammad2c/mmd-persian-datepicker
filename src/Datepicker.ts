@@ -382,7 +382,7 @@ class PrivateDatepicker {
     return target
   }
 
-  private onDayClick = (selectedDate: ISelectedDateItem) => {
+  private onDayClick = () => {
     const { options } = this
 
     if (typeof options.onClick === 'function') {
@@ -535,8 +535,15 @@ class PrivateDatepicker {
     }
   }
 
-  private setValue = (dateValue: Moment | string) => {
+  private setValue = (dateValue?: Moment | string) => {
     const { options } = this
+
+    if (!dateValue) {
+      this.selectedDates = []
+      this.setElemValue('')
+      return
+    }
+
     const momented = moment.isMoment(dateValue) ? dateValue : this.getMomented(dateValue)
     const foundedSelectedDate = this.findSelectedDate(dateValue)
 
@@ -651,6 +658,17 @@ class PrivateDatepicker {
 
   public close = (): void => {
     if (!this.isOpen) return
+
+    const { mode } = this.options
+
+    if (mode === 'range' && !this.selectedDates[1]) {
+      this.setValue()
+      this.inRangeDates = []
+      this.tempMaxDate = undefined
+      this.onDayClick()
+      this.handleDaysState()
+    }
+
     this.isOpen = false
     this.removeOpenClass()
   }

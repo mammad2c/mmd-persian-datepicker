@@ -245,6 +245,8 @@ class Day {
         } else {
           dayElem.classList.remove(constants.inRangeDayItemClassName)
         }
+      } else if (mode === 'range' && !startDate) {
+        dayElem.classList.remove(constants.inRangeDayItemClassName)
       }
     }
   }

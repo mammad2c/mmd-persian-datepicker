@@ -19,6 +19,7 @@ interface IDay {
   findSelectedDate: (dateValue: Moment | string) => ISelectedDateItem | undefined
   findInRangeDate: (dateValue: Moment | string) => ISelectedDateItem['momented'] | undefined
   handleDaysState: () => void
+  disabledDates: Array<Moment>
 }
 
 interface IDayUpdate {
@@ -29,6 +30,7 @@ interface IDayUpdate {
   isDisabled?: IDay['isDisabled']
   format: IDay['format']
   multiple: IDay['multiple']
+  disabledDates: Array<Moment>
 }
 
 class Day {
@@ -48,6 +50,7 @@ class Day {
   private findSelectedDate: IDay['findSelectedDate']
   private findInRangeDate: IDay['findInRangeDate']
   private handleDaysState: IDay['handleDaysState']
+  private disabledDates: IDay['disabledDates']
 
   constructor({
     date,
@@ -65,6 +68,7 @@ class Day {
     findSelectedDate,
     findInRangeDate,
     handleDaysState,
+    disabledDates,
   }: IDay) {
     this.date = date
     this.onClick = onClick
@@ -83,6 +87,7 @@ class Day {
     this.handleDaysState = handleDaysState
     this.isDisabled = isDisabled
     this.handleDisable()
+    this.disabledDates = disabledDates
   }
 
   private handleOnDayClick = () => {
@@ -147,13 +152,23 @@ class Day {
 
   private handleDisable = () => {
     const { isDisabled, minDate, date } = this
-    if (isDisabled) {
+    if (isDisabled || this.isInDisabledDates()) {
       this.isDisabled = true
     } else if (minDate && date.isBefore(minDate, 'd')) {
       this.isDisabled = true
     } else {
       this.isDisabled = false
     }
+  }
+
+  private isInDisabledDates = (): boolean => {
+    const { disabledDates, date } = this
+
+    if (!disabledDates) {
+      return false
+    }
+
+    return !!disabledDates.find((item) => date.isSame(item, 'd'))
   }
 
   public getDate = () => {
@@ -197,9 +212,9 @@ class Day {
         dayElem.classList.add(constants.selectedDayItemClassName)
       }
 
-      if (multiple && foundedSelectedDate) {
+      if (this.multiple && foundedSelectedDate) {
         dayElem.classList.add(constants.selectedDayItemClassName)
-      } else if (multiple && !foundedSelectedDate) {
+      } else if (this.multiple && !foundedSelectedDate) {
         dayElem.classList.remove(constants.selectedDayItemClassName)
       }
 

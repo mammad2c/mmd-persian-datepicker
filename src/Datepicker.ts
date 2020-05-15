@@ -2,7 +2,7 @@ import moment, { Moment } from 'moment-jalaali'
 
 // library imports
 import { constants } from './configs/constants'
-import { IElemPosition, IOptions, ISelectedDates, ISelectedDateItem } from './types'
+import { IElemPosition, IOptions, ISelectedDates, ISelectedDateItem, disabledDates } from './types'
 import Day from './components/Day'
 import { getValueObject } from './utils/getValueObject'
 
@@ -18,6 +18,7 @@ const defaultOptionsValue: IOptions<Datepicker> = {
   maxDate: false,
   timeout: 250,
   format: 'jYYYY/jM/jD',
+  disabledDates: [],
   classNames: {
     baseClassName: constants.baseClassName,
     monthWrapperClassName: constants.monthWrapperClassName,
@@ -104,6 +105,7 @@ class PrivateDatepicker {
   private isOpen: boolean
   private minDate?: Moment
   private days: Array<Day> = []
+  private disabledDates: Array<Moment>
 
   constructor(elem: string, pickerPrivater: Datepicker, options?: IOptions<Datepicker>) {
     this.elemId = elem
@@ -124,7 +126,9 @@ class PrivateDatepicker {
     this.currentMonth = this.todayMonth
     this.currentYear = this.todayYear
     this.isOpen = false
+    this.disabledDates = []
     this.handleClickOutside()
+    this.validateDisabledDates()
 
     const { minDate, defaultValue, format } = this.options
 
@@ -311,6 +315,7 @@ class PrivateDatepicker {
         findSelectedDate: this.findSelectedDate,
         findInRangeDate: this.findInRangeDate,
         handleDaysState: this.handleDaysState,
+        disabledDates: this.disabledDates,
       })
 
       days.appendChild(day.render())
@@ -378,6 +383,7 @@ class PrivateDatepicker {
 
   private handleDaysState = () => {
     const { days, options } = this
+    this.validateDisabledDates()
 
     for (let i = 0; i < days.length; i++) {
       const day = days[i]
@@ -388,6 +394,7 @@ class PrivateDatepicker {
         autoClose: options.autoClose,
         format: options.format,
         multiple: options.multiple,
+        disabledDates: this.disabledDates,
       })
     }
   }
@@ -596,6 +603,24 @@ class PrivateDatepicker {
 
   private isMonthOverflow = (additional: number = 0): boolean => {
     return additional + this.currentMonth >= this.options.monthNames.length
+  }
+
+  private validateDisabledDates = (): void => {
+    const { disabledDates, format } = this.options
+
+    if (!disabledDates || disabledDates.length === 0) {
+      return
+    }
+
+    this.disabledDates = disabledDates.map((item) => {
+      if (typeof item === 'string') {
+        return moment(item, format)
+      } else if (item instanceof Date) {
+        return moment(item)
+      } else {
+        return item
+      }
+    })
   }
 
   public open = (): void => {

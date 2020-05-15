@@ -16,6 +16,8 @@ export interface IElemPosition {
 
 export type mode = 'single' | 'range'
 
+export type disabledDates = Array<Moment | string | Date>
+
 export interface IOptions<T> {
   // configs
   defaultValue: Date | string | boolean
@@ -29,6 +31,7 @@ export interface IOptions<T> {
   maxDate?: boolean | Moment | Date | string | null
   timeout: number
   format: string
+  disabledDates: disabledDates
   classNames: {
     baseClassName: string
     monthWrapperClassName: string

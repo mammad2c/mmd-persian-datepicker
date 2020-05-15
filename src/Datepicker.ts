@@ -159,23 +159,6 @@ class PrivateDatepicker {
     })
   }
 
-  public open = (): void => {
-    if (this.isOpen) return
-    this.isOpen = true
-    this.setPosition()
-    this.addOpenClass()
-  }
-
-  public close = (): void => {
-    if (!this.isOpen) return
-    this.isOpen = false
-    this.removeOpenClass()
-  }
-
-  public getValue = (): ISelectedDates => {
-    return this.selectedDates
-  }
-
   private calculateDaysInCurrentMonth = (additional: number = 0): number[] => {
     const { currentYear, currentMonth } = this
     const monthOverflow = this.isMonthOverflow(additional)
@@ -640,6 +623,23 @@ class PrivateDatepicker {
 
   private isMonthOverflow = (additional: number = 0): boolean => {
     return additional + this.currentMonth >= this.options.monthNames.length
+  }
+
+  public open = (): void => {
+    if (this.isOpen) return
+    this.isOpen = true
+    this.setPosition()
+    this.addOpenClass()
+  }
+
+  public close = (): void => {
+    if (!this.isOpen) return
+    this.isOpen = false
+    this.removeOpenClass()
+  }
+
+  public getValue = (): ISelectedDates => {
+    return this.selectedDates
   }
 }
 

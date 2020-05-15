@@ -317,6 +317,7 @@ class PrivateDatepicker {
         today: this.today,
         minDate: this.minDate,
         setValue: this.setValue,
+        onClick: this.onDayClick,
         mode: options.mode,
         selectedDates: this.selectedDates,
         autoClose: options.autoClose,
@@ -377,24 +378,8 @@ class PrivateDatepicker {
     return target
   }
 
-  private onDayClick = (e: MouseEvent) => {
+  private onDayClick = (selectedDate: ISelectedDateItem) => {
     const { options } = this
-    const target = this.getValidDayTarget(e)
-
-    if (!target) {
-      return
-    }
-
-    const isDateValueNull = target.getAttribute('data-date')
-    const dateValue = isDateValueNull ? isDateValueNull : ''
-    const momented = this.getMomented(dateValue)
-
-    if (this.minDate && momented.isBefore(this.minDate, 'd')) {
-      return
-    }
-
-    this.inRangeDates = options.mode === 'range' ? [momented.clone().add(1, 'd')] : []
-    this.setValue(momented)
 
     if (typeof options.onClick === 'function') {
       this.handleOnClickEvent(this.selectedDates)
@@ -458,21 +443,13 @@ class PrivateDatepicker {
     for (let i = 0; i < days.length; i++) {
       const day = days[i]
       day.updateDayState({
-        date: day.getDate(),
-        today: this.today,
         minDate: this.minDate,
-        setValue: this.setValue,
         mode: options.mode,
         selectedDates: this.selectedDates,
         autoClose: options.autoClose,
-        close: this.close,
         format: options.format,
         inRangeDates: this.inRangeDates,
-        setInRangeDates: this.setInRangeDates,
         multiple: options.multiple,
-        findSelectedDate: this.findSelectedDate,
-        findInRangeDate: this.findInRangeDate,
-        handleDaysState: this.handleDaysState,
       })
     }
   }

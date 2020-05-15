@@ -23,6 +23,16 @@ interface IDay {
   handleDaysState: () => void
 }
 
+interface IDayUpdate {
+  selectedDates: IDay['selectedDates']
+  minDate: IDay['minDate']
+  inRangeDates: IDay['inRangeDates']
+  mode: IDay['mode']
+  autoClose: IDay['autoClose']
+  format: IDay['format']
+  multiple: IDay['multiple']
+}
+
 class Day {
   private date: IDay['date']
   private isDisabled: boolean
@@ -168,41 +178,23 @@ class Day {
   }
 
   public updateDayState = ({
-    date,
-    onClick,
     minDate,
-    today,
     mode,
     selectedDates,
-    setValue,
     autoClose,
-    close,
     format,
     inRangeDates,
-    setInRangeDates,
     multiple,
-    findSelectedDate,
-    findInRangeDate,
-    handleDaysState,
-  }: IDay) => {
-    this.date = date
-    this.onClick = onClick
-    this.today = today
+  }: IDayUpdate) => {
     this.mode = mode
     this.minDate = minDate
     this.selectedDates = selectedDates
-    this.setValue = setValue
     this.autoClose = autoClose
-    this.close = close
     this.format = format
     this.inRangeDates = inRangeDates
-    this.setInRangeDates = setInRangeDates
     this.multiple = multiple
-    this.findSelectedDate = findSelectedDate
-    this.findInRangeDate = findInRangeDate
-    this.handleDaysState = handleDaysState
 
-    const { dayElem } = this
+    const { dayElem, date } = this
     const startDate = selectedDates[0]
 
     if (minDate && date.isBefore(minDate, 'd')) {

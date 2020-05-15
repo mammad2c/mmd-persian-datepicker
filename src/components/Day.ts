@@ -15,7 +15,6 @@ interface IDay {
   setInRangeDates: (value: IDay['inRangeDates']) => void
   mode: mode
   autoClose: boolean
-  close: () => void
   format: string
   multiple: boolean
   findSelectedDate: (dateValue: Moment | string) => ISelectedDateItem | undefined
@@ -43,7 +42,6 @@ class Day {
   private minDate: IDay['minDate']
   private setValue: IDay['setValue']
   private autoClose: IDay['autoClose']
-  private close: IDay['close']
   private format: IDay['format']
   private inRangeDates: IDay['inRangeDates']
   private setInRangeDates: IDay['setInRangeDates']
@@ -63,7 +61,6 @@ class Day {
     selectedDates,
     setValue,
     autoClose,
-    close,
     format,
     inRangeDates,
     setInRangeDates,
@@ -80,7 +77,6 @@ class Day {
     this.selectedDates = selectedDates
     this.setValue = setValue
     this.autoClose = autoClose
-    this.close = close
     this.format = format
     this.inRangeDates = inRangeDates
     this.setInRangeDates = setInRangeDates
@@ -106,17 +102,7 @@ class Day {
       return
     }
 
-    const {
-      date,
-      minDate,
-      setValue,
-      mode,
-      onClick,
-      close,
-      autoClose,
-      format,
-      setInRangeDates,
-    } = this
+    const { date, minDate, setValue, mode, onClick, autoClose, format, setInRangeDates } = this
 
     if (minDate && date.isBefore(minDate, 'd')) {
       return
@@ -131,10 +117,6 @@ class Day {
 
     if (typeof onClick === 'function') {
       onClick(getValueObject(date, format))
-    }
-
-    if (autoClose) {
-      close()
     }
   }
 

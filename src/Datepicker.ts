@@ -321,7 +321,6 @@ class PrivateDatepicker {
         mode: options.mode,
         selectedDates: this.selectedDates,
         autoClose: options.autoClose,
-        close: this.close,
         format: options.format,
         inRangeDates: this.inRangeDates,
         setInRangeDates: this.setInRangeDates,

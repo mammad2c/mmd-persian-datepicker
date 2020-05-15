@@ -23,7 +23,7 @@ body {
   box-shadow: 0 0 5px #ccc;
   height: 50px;
   text-align: center;
-  width: 334px;
+  /* width: 334px; */
   border-radius: 40px;
   display: block;
   margin: 5em auto;

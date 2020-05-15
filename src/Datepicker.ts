@@ -2,7 +2,7 @@ import moment, { Moment } from 'moment-jalaali'
 
 // library imports
 import { constants } from './configs/constants'
-import { IElemPosition, IOptions, ISelectedDates, ISelectedDateItem, disabledDates } from './types'
+import { IElemPosition, IOptions, ISelectedDates, ISelectedDateItem } from './types'
 import Day from './components/Day'
 import { getValueObject } from './utils/getValueObject'
 import { getValidatedMoment } from './utils/getValidatedMoment'
@@ -20,8 +20,10 @@ const defaultOptionsValue: IOptions<Datepicker> = {
   timeout: 250,
   format: 'jYYYY/jM/jD',
   disabledDates: [],
+  inline: false,
   classNames: {
     baseClassName: constants.baseClassName,
+    inlineClassName: constants.inlineClassName,
     monthWrapperClassName: constants.monthWrapperClassName,
     // headers class name:
     headerClassName: constants.headerClassName,
@@ -172,7 +174,10 @@ class PrivateDatepicker {
 
     this.tempMaxDate = undefined
     this.createElement()
-    window.addEventListener('resize', this.handleResize)
+
+    if (!this.options.inline) {
+      window.addEventListener('resize', this.handleResize)
+    }
   }
 
   private handleResize = () => {
@@ -211,9 +216,15 @@ class PrivateDatepicker {
   }
 
   private createElement = (): void => {
-    const { options } = this
+    const { classNames, numberOfMonths, inline } = this.options
+
     this.calendarElem.setAttribute('id', `${this.elem.getAttribute('id')}-calendar`)
-    this.calendarElem.classList.add(options.classNames.baseClassName)
+    this.calendarElem.classList.add(classNames.baseClassName)
+
+    if (inline) {
+      this.calendarElem.classList.add(classNames.inlineClassName)
+      this.addOpenClass()
+    }
 
     // remove any previous data in calendar elem
     while (this.calendarElem.firstChild) {
@@ -227,14 +238,19 @@ class PrivateDatepicker {
 
     this.days = []
     // append header and body for calendar
-    for (let index = 0; index < options.numberOfMonths; index++) {
+    for (let index = 0; index < numberOfMonths; index++) {
       const monthWrapper = this.createMonthWrapper()
       monthWrapper.appendChild(this.createHeader(index))
       monthWrapper.appendChild(this.createBody(index))
       this.calendarElem.appendChild(monthWrapper)
     }
 
-    document.body.appendChild(this.calendarElem)
+    if (inline) {
+      this.elem.appendChild(this.calendarElem)
+    } else {
+      document.body.appendChild(this.calendarElem)
+    }
+
     this.handleDaysState()
     this.elem.addEventListener('click', this.open)
   }
@@ -571,6 +587,10 @@ class PrivateDatepicker {
   }
 
   private setElemValue = (str: any): void => {
+    if (this.options.inline) {
+      return
+    }
+
     if (this.elem instanceof HTMLInputElement) {
       this.elem.value = str
     } else {
@@ -645,7 +665,9 @@ class PrivateDatepicker {
   public open = (): void => {
     if (this.isOpen) return
     this.isOpen = true
-    this.setPosition()
+    if (!this.options.inline) {
+      this.setPosition()
+    }
     this.addOpenClass()
   }
 

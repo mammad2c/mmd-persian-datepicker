@@ -32,8 +32,10 @@ export interface IOptions<T> {
   timeout: number
   format: string
   disabledDates: disabledDates
+  inline: boolean
   classNames: {
     baseClassName: string
+    inlineClassName: string
     monthWrapperClassName: string
     // headers class name:
     headerClassName: string

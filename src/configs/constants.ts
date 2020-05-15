@@ -1,5 +1,6 @@
 export enum constants {
   baseClassName = 'mmd-picker',
+  inlineClassName = 'mmd-picker--inline',
   monthWrapperClassName = 'mmd-picker__month-wrapper',
 
   // headers class name:

@@ -493,6 +493,10 @@ class PrivateDatepicker {
   }
 
   private closeOnClickOutside = (e: MouseEvent) => {
+    if (!this.isOpen) {
+      return
+    }
+
     if (e.target === this.elem) return
     if (!(e.target === this.calendarElem)) {
       this.close()

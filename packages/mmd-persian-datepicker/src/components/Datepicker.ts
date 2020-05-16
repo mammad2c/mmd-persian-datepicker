@@ -14,14 +14,14 @@ import { defaultOptionsValue } from "../configs/defaultOptionsValue";
 
 class PrivateDatepicker {
   // constructor elements
-  private elem: HTMLInputElement | HTMLElement;
+  private elem: HTMLElement;
 
   private options: IOptions<Datepicker>;
 
   private pickerPrivater: Datepicker;
 
   // rests
-  private elemId: string;
+  private elemId?: string;
 
   private elemPosition?: IElemPosition;
 
@@ -56,15 +56,18 @@ class PrivateDatepicker {
   private disabledDates: Array<Moment>;
 
   constructor(
-    elem: string,
+    elem: HTMLElement | string,
     pickerPrivater: Datepicker,
     options?: IOptions<Datepicker>
   ) {
-    this.elemId = elem;
-    const elemExist = document.querySelector(elem) as HTMLInputElement;
+    this.elemId = typeof elem === "string" ? elem : undefined;
+    const elemExist =
+      typeof elem === "string"
+        ? (document.querySelector(elem) as HTMLElement)
+        : elem;
 
     if (!elemExist) {
-      throw Error(`the ${elem} not found in your dom`);
+      throw Error(`your element is not a valid dom`);
     } else {
       this.elem = elemExist;
     }
@@ -723,7 +726,7 @@ class Datepicker {
    * @param elem the element css selector
    * @param options Datepicker options
    */
-  constructor(elem: string, options?: IOptions<Datepicker>) {
+  constructor(elem: HTMLElement | string, options?: IOptions<Datepicker>) {
     const datepicker = new PrivateDatepicker(elem, this, options);
     this.getValue = datepicker.getValue;
     this.open = datepicker.open;

@@ -1,0 +1,84 @@
+{
+  "name": "react-mmd-persian-datepicker",
+  "version": "0.1.5",
+  "description": "React component for mmd-persian-datepicker",
+  "keywords": [
+    "datepicker",
+    "calendar",
+    "persian",
+    "jalali",
+    "farsi",
+    "persian datepicker",
+    "jalali datepicker",
+    "persian calendar"
+  ],
+  "main": "dist/react-mmd-persian-datepicker.umd.js",
+  "module": "dist/react-mmd-persian-datepicker.es5.js",
+  "typings": "dist/types/react-mmd-persian-datepicker.d.ts",
+  "files": [
+    "dist"
+  ],
+  "author": "Mohammad Toosi m_dd@rogers.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mammad2c/mmd-persian-datepicker",
+    "directory": "packages/react-mmd-persian-datepicker"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "build": "tsc --module commonjs && cross-env NODE_ENV=production rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
+    "start": "rollup -c rollup.config.ts -w",
+    "start:example": "parcel example/index.html",
+    "test": "jest --coverage",
+    "test:watch": "jest --coverage --watch",
+    "test:prod": "npm run lint && npm run test -- --no-cache"
+  },
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "ts-jest"
+    },
+    "testEnvironment": "node",
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/test/"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 95,
+        "lines": 95,
+        "statements": 95
+      }
+    },
+    "collectCoverageFrom": [
+      "src/*.{js,ts}"
+    ]
+  },
+  "dependencies": {
+    "mmd-persian-datepicker": "^0.1.5",
+    "react": "16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/preset-react": "^7.9.4",
+    "@babel/preset-typescript": "^7.9.0",
+    "@rollup/plugin-typescript": "^4.1.1",
+    "@types/react": "^16.9.35",
+    "@types/react-dom": "^16.9.8",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-sourcemaps": "^0.6.2"
+  }
+}

@@ -1,32 +1,32 @@
-import resolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
-import sourceMaps from 'rollup-plugin-sourcemaps'
-import typescript from 'rollup-plugin-typescript2'
-import json from 'rollup-plugin-json'
-import scss from 'rollup-plugin-scss'
-import { uglify } from 'rollup-plugin-uglify'
+import resolve from "rollup-plugin-node-resolve";
+import commonjs from "rollup-plugin-commonjs";
+import sourceMaps from "rollup-plugin-sourcemaps";
+import typescript from "rollup-plugin-typescript2";
+import json from "rollup-plugin-json";
+import scss from "rollup-plugin-scss";
+import { uglify } from "rollup-plugin-uglify";
 
-const isProduction = process.env.NODE_ENV === 'production'
+const isProduction = process.env.NODE_ENV === "production";
 
-const pkg = require('./package.json')
+const pkg = require("./package.json");
 
-const libraryName = 'mmd-persian-datepicker'
+const libraryName = "mmd-persian-datepicker";
 
 export default {
   input: `src/${libraryName}.ts`,
   output: [
     {
       file: pkg.main,
-      name: 'MmdPersianDatepicker',
-      format: 'umd',
+      name: "MmdPersianDatepicker",
+      format: "umd",
       sourcemap: true,
-      globals: { 'moment-jalaali': 'moment' },
+      globals: { "moment-jalaali": "moment" },
     },
   ],
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
-  external: ['moment-jalaali'],
+  external: [...Object.keys(pkg.dependencies)],
   watch: {
-    include: 'src/**',
+    include: "src/**",
   },
   plugins: [
     // Allow json resolution
@@ -45,4 +45,4 @@ export default {
     scss(),
     isProduction && uglify(),
   ],
-}
+};

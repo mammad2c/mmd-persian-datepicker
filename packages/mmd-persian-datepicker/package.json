@@ -1,0 +1,75 @@
+{
+  "name": "mmd-persian-datepicker",
+  "version": "0.1.5",
+  "description": "A pure js persian datepicker, powered by TypeScript :)",
+  "keywords": [
+    "datepicker",
+    "calendar",
+    "persian",
+    "jalali",
+    "farsi",
+    "persian datepicker",
+    "jalali datepicker",
+    "persian calendar"
+  ],
+  "main": "dist/mmd-persian-datepicker.umd.js",
+  "module": "dist/mmd-persian-datepicker.es5.js",
+  "typings": "dist/types/mmd-persian-datepicker.d.ts",
+  "files": [
+    "dist"
+  ],
+  "author": "Mohammad Toosi m_dd@rogers.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mammad2c/mmd-persian-datepicker",
+    "directory": "packages/mmd-persian-datepicker"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "build": "tsc --module commonjs && cross-env NODE_ENV=production rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
+    "start": "rollup -c rollup.config.ts -w",
+    "start:example": "parcel example/index.html",
+    "test": "jest --coverage",
+    "test:watch": "jest --coverage --watch",
+    "test:prod": "npm run lint && npm run test -- --no-cache"
+  },
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "ts-jest"
+    },
+    "testEnvironment": "node",
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/test/"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 95,
+        "lines": 95,
+        "statements": 95
+      }
+    },
+    "collectCoverageFrom": [
+      "src/*.{js,ts}"
+    ]
+  },
+  "peerDependencies": {
+    "moment": "^2.25.3",
+    "moment-jalaali": "^0.9.2"
+  },
+  "dependencies": {
+    "moment": "^2.25.3",
+    "moment-jalaali": "^0.9.2"
+  }
+}

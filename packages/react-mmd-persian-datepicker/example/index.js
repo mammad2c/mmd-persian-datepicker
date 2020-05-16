@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import MmdPersianDatepicker from "../dist/react-mmd-persian-datepicker.umd";
+import MmdPersianDatepicker from "../src/ReactComponent";
 
 function App() {
   return <MmdPersianDatepicker />;

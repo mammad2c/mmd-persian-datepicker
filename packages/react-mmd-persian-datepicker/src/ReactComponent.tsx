@@ -1,8 +1,12 @@
 import React from "react";
-import MmdPersianDatepicker from "mmd-persian-datepicker/src/Datepicker";
-import { IOptions } from "mmd-persian-datepicker/src/types";
+import MmdPersianDatepicker, {
+  IOptions,
+  defaultOptionsValue,
+} from "mmd-persian-datepicker/src/mmd-persian-datepicker";
 
-interface Props extends IOptions<MmdPersianDatepicker> {
+console.log("defaultOptionsValue: ");
+
+interface Props extends IOptions {
   inputProps?: React.DetailedHTMLProps<
     React.InputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
@@ -10,6 +14,8 @@ interface Props extends IOptions<MmdPersianDatepicker> {
 }
 
 class ReactComponent extends React.Component<Props> {
+  public componentDidMount() {}
+
   public render() {
     const { inline, inputProps } = this.props;
 

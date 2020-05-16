@@ -10,7 +10,7 @@ import {
 import Day from "./components/Day";
 import { getValueObject } from "./utils/getValueObject";
 import { getValidatedMoment } from "./utils/getValidatedMoment";
-import { defaultOptionsValue } from "./configs/defaultConfig";
+import { defaultOptionsValue } from "./configs/defaultOptionsValue";
 
 class Datepicker {
   public getValue: () => ISelectedDates;

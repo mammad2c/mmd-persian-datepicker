@@ -6,13 +6,17 @@
     "lib": ["es2015", "es2016", "es2017", "dom"],
     "strict": true,
     "sourceMap": true,
+    "allowJs": true,
+    "noImplicitAny": false,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "declarationDir": "dist/types",
-    "outDir": "dist/lib",
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": ["node_modules/@types"],
+    "baseUrl": ".",
+    "paths": {
+      "@mmd-package/*": ["packages/*/src"]
+    }
   },
-  "include": ["src"]
+  "exclude": ["node_modules", "packages/**/node_modules"]
 }

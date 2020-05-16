@@ -4,11 +4,14 @@ import sourceMaps from "rollup-plugin-sourcemaps";
 import babel from "rollup-plugin-babel";
 import typescript from "rollup-plugin-typescript2";
 import json from "rollup-plugin-json";
+import postcss from "rollup-plugin-postcss";
 import { uglify } from "rollup-plugin-uglify";
+import postcssFlexbugsFixes from "postcss-flexbugs-fixes";
+import postcssPresetEnv from "postcss-preset-env";
+import path from "path";
+import pkg from "./package.json";
 
 const isProduction = process.env.NODE_ENV === "production";
-
-const pkg = require("./package.json");
 
 export default {
   input: `src/ReactComponent.tsx`,
@@ -34,7 +37,7 @@ export default {
     // Allow json resolution
     json(),
     // Compile TypeScript files
-    typescript({}),
+    typescript(),
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
     commonjs(),
     // Allow node_modules resolution, so you can use 'external' to control
@@ -47,12 +50,31 @@ export default {
         "@babel/preset-typescript",
         "@babel/preset-react",
       ],
+      extensions: [".js", ".jsx", ".ts", ".tsx"],
       plugins: [
         "@babel/plugin-proposal-class-properties",
         "@babel/transform-runtime",
       ],
       exclude: "node_modules/**",
       runtimeHelpers: true,
+    }),
+    postcss({
+      plugins: [
+        postcssFlexbugsFixes,
+        postcssPresetEnv({
+          autoprefixer: {
+            flexbox: "no-2009",
+            overrideBrowserslist: [
+              "last 10 versions",
+              "> 1%",
+              "ie 10",
+              "not op_mini all",
+            ],
+          },
+          stage: 3,
+        }),
+      ],
+      extract: path.resolve("dist/mmd-persian-datepicker.css"),
     }),
     // Resolve source maps to the original source
     sourceMaps(),

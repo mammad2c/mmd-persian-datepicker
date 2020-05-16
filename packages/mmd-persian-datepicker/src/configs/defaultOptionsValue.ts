@@ -1,5 +1,5 @@
-import Datepicker from "../Datepicker";
-import { IOptions } from "../types";
+import Datepicker from "../components/Datepicker";
+import { IOptions } from "../models/general";
 import { constants } from "./constants";
 
 export const defaultOptionsValue: IOptions<Datepicker> = {

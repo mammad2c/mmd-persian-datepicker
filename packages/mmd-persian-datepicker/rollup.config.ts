@@ -3,19 +3,20 @@ import commonjs from "rollup-plugin-commonjs";
 import sourceMaps from "rollup-plugin-sourcemaps";
 import typescript from "rollup-plugin-typescript2";
 import json from "rollup-plugin-json";
-import scss from "rollup-plugin-scss";
+import postcss from "rollup-plugin-postcss";
 import { uglify } from "rollup-plugin-uglify";
+import postcssFlexbugsFixes from "postcss-flexbugs-fixes";
+import postcssPresetEnv from "postcss-preset-env";
+import path from "path";
+import pkg from "./package.json";
 
 const isProduction = process.env.NODE_ENV === "production";
 
-const pkg = require("./package.json");
-
-const libraryName = "mmd-persian-datepicker";
-
 export default {
-  input: `src/${libraryName}.ts`,
+  input: `src/index.ts`,
   output: [
     {
+      exports: "named",
       file: pkg.main,
       name: "MmdPersianDatepicker",
       format: "umd",
@@ -32,7 +33,7 @@ export default {
     // Allow json resolution
     json(),
     // Compile TypeScript files
-    typescript({ useTsconfigDeclarationDir: true, clean: true }),
+    typescript({ useTsconfigDeclarationDir: true }),
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
     commonjs(),
     // Allow node_modules resolution, so you can use 'external' to control
@@ -41,8 +42,25 @@ export default {
     resolve(),
 
     // Resolve source maps to the original source
+    postcss({
+      plugins: [
+        postcssFlexbugsFixes,
+        postcssPresetEnv({
+          autoprefixer: {
+            flexbox: "no-2009",
+            overrideBrowserslist: [
+              "last 10 versions",
+              "> 1%",
+              "ie 10",
+              "not op_mini all",
+            ],
+          },
+          stage: 3,
+        }),
+      ],
+      extract: path.resolve("dist/mmd-persian-datepicker.css"),
+    }),
     sourceMaps(),
-    scss(),
     isProduction && uglify(),
   ],
 };

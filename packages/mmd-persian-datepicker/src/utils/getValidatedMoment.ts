@@ -6,13 +6,13 @@ const getValidatedMoment = (
 ): Moment | null => {
   if (moment.isMoment(value)) {
     return value
-  } else if (typeof value === 'string') {
+  } if (typeof value === 'string') {
     return moment(value, format)
-  } else if (value instanceof Date) {
+  } if (value instanceof Date) {
     return moment(value, format)
-  } else {
+  } 
     return null
-  }
+  
 }
 
 export { getValidatedMoment }

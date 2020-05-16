@@ -1,5 +1,9 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src"],
+  "compilerOptions": {
+    "declarationDir": "dist/types",
+    "outDir": "dist/lib"
+  },
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", ".cache"]
 }

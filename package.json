@@ -4,6 +4,8 @@
     "packages/*"
   ],
   "devDependencies": {
-    "lerna": "^3.18.3"
+    "husky": "^4.2.5",
+    "lerna": "^3.18.3",
+    "prettier": "^2.0.5"
   }
 }

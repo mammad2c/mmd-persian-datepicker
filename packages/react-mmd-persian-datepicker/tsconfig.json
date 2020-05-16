@@ -1,8 +1,10 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "jsx": "react"
+    "jsx": "react",
+    "declarationDir": "dist/types",
+    "outDir": "dist/lib"
   },
-  "include": ["src", "../mmd-persian-datepicker/src/**/*.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", ".cache"]
 }

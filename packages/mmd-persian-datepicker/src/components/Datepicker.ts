@@ -6,57 +6,53 @@ import {
   IOptions,
   ISelectedDates,
   ISelectedDateItem,
-} from "./types";
-import Day from "./components/Day";
-import { getValueObject } from "./utils/getValueObject";
-import { getValidatedMoment } from "./utils/getValidatedMoment";
-import { defaultOptionsValue } from "./configs/defaultOptionsValue";
-
-class Datepicker {
-  public getValue: () => ISelectedDates;
-  public open: () => void;
-  public close: () => void;
-  public destroy: () => void;
-  public setDate: () => void;
-
-  /**
-   * Datepicker constructor params:
-   * @param elem the element css selector
-   * @param options Datepicker options
-   */
-  constructor(elem: string, options?: IOptions<Datepicker>) {
-    const datepicker = new PrivateDatepicker(elem, this, options);
-    this.getValue = datepicker.getValue;
-    this.open = datepicker.open;
-    this.close = datepicker.close;
-    this.destroy = datepicker.destroy;
-    this.setDate = datepicker.setDate;
-  }
-}
+} from "../models/general";
+import Day from "./Day";
+import { getValueObject } from "../utils/getValueObject";
+import { getValidatedMoment } from "../utils/getValidatedMoment";
+import { defaultOptionsValue } from "../configs/defaultOptionsValue";
 
 class PrivateDatepicker {
   // constructor elements
   private elem: HTMLInputElement | HTMLElement;
+
   private options: IOptions<Datepicker>;
+
   private pickerPrivater: Datepicker;
 
   // rests
   private elemId: string;
+
   private elemPosition?: IElemPosition;
+
   private calendarElem: HTMLElement;
+
   private today: Moment;
+
   private todayMonth: number;
+
   private todayYear: number;
+
   private currentYear: number;
+
   private currentMonth: number;
+
   private selectedDates: ISelectedDates = [];
-  private inRangeDates: Array<ISelectedDateItem["momented"]> = ([] = []);
-  private timeoutTemp?: any;
+
+  private inRangeDates: Array<ISelectedDateItem["momented"]> = [];
+
+  private timeoutTemp?: NodeJS.Timeout | number;
+
   private isOpen: boolean;
+
   private minDate?: Moment;
+
   private maxDate?: Moment;
+
   private tempMaxDate?: Moment;
+
   private days: Array<Day> = [];
+
   private disabledDates: Array<Moment>;
 
   constructor(
@@ -129,30 +125,32 @@ class PrivateDatepicker {
     }
   }
 
-  private handleResize = () => {
+  private handleResize = (): void => {
     if (!this.isOpen) {
       return;
     }
-    clearTimeout(this.timeoutTemp);
+    if (typeof this.timeoutTemp === "number") {
+      clearTimeout(this.timeoutTemp);
+    }
     this.timeoutTemp = setTimeout(this.setPosition, this.options.timeout);
   };
 
-  private calculateDaysInCurrentMonth = (additional: number = 0): number[] => {
+  private calculateDaysInCurrentMonth = (additional = 0): number[] => {
     const { currentYear, currentMonth } = this;
     const monthOverflow = this.isMonthOverflow(additional);
     const month = monthOverflow ? 1 : currentMonth + additional;
     const year = monthOverflow ? currentYear + 1 : currentYear;
 
     const totalDays = moment.jDaysInMonth(year, month);
-    let daysInCurrentMonth = [];
-    for (let i = 1; i <= totalDays; i++) {
+    const daysInCurrentMonth: number[] = [];
+    for (let i = 1; i <= totalDays; i += 1) {
       daysInCurrentMonth.push(i);
     }
     return daysInCurrentMonth;
   };
 
-  private calculateFirstDayOfMonth = (additional: number = 0): string => {
-    const { currentMonth, currentYear, options } = this;
+  private calculateFirstDayOfMonth = (additional = 0): string => {
+    const { currentMonth, currentYear } = this;
     const monthOverflow = this.isMonthOverflow(additional);
     const month = monthOverflow ? 1 : currentMonth + additional;
     const year = monthOverflow ? currentYear + 1 : currentYear;
@@ -190,7 +188,7 @@ class PrivateDatepicker {
 
     this.days = [];
     // append header and body for calendar
-    for (let index = 0; index < numberOfMonths; index++) {
+    for (let index = 0; index < numberOfMonths; index += 1) {
       const monthWrapper = this.createMonthWrapper();
       monthWrapper.appendChild(this.createHeader(index));
       monthWrapper.appendChild(this.createBody(index));
@@ -215,7 +213,10 @@ class PrivateDatepicker {
     return monthWrapper;
   };
 
-  private createArrowsNavigation = () => {
+  private createArrowsNavigation = (): {
+    arrowLeft: HTMLSpanElement;
+    arrowRight: HTMLSpanElement;
+  } => {
     const { options } = this;
     const arrowRight = document.createElement("span");
     const arrowLeft = document.createElement("span");
@@ -238,7 +239,7 @@ class PrivateDatepicker {
     return { arrowLeft, arrowRight };
   };
 
-  private createHeader = (additional: number = 0): HTMLElement => {
+  private createHeader = (additional = 0): HTMLElement => {
     const { options, currentMonth, currentYear } = this;
     const { monthNames, classNames } = options;
     const header = document.createElement("div");
@@ -267,13 +268,16 @@ class PrivateDatepicker {
     return header;
   };
 
-  private createBody = (additional: number = 0): HTMLElement => {
-    const { options, currentYear, currentMonth, selectedDates } = this;
+  private createBody = (additional = 0): HTMLElement => {
+    const { options, currentYear, currentMonth } = this;
     const body = document.createElement("div");
     const days = document.createElement("div");
     const weeks = document.createElement("div");
     const { weekName } = options;
-    const offsetStartWeek = parseInt(this.calculateFirstDayOfMonth(additional));
+    const offsetStartWeek = parseInt(
+      this.calculateFirstDayOfMonth(additional),
+      10
+    );
     const monthOverflow = this.isMonthOverflow(additional);
     const month = monthOverflow ? 1 : currentMonth + additional + 1;
     const year = monthOverflow ? currentYear + 1 : currentYear;
@@ -281,13 +285,13 @@ class PrivateDatepicker {
     body.classList.add(options.classNames.bodyClassName);
     days.classList.add(options.classNames.daysClassName);
 
-    for (let i = 0; i < offsetStartWeek; i++) {
+    for (let i = 0; i < offsetStartWeek; i += 1) {
       days.innerHTML += `<span class="${options.classNames.dayItemClassName} ${options.classNames.disabledDayItemClassName}"></span>`;
     }
 
     const daysInCurrentMonth = this.calculateDaysInCurrentMonth(additional);
 
-    for (let i = 1; i <= daysInCurrentMonth.length; i++) {
+    for (let i = 1; i <= daysInCurrentMonth.length; i += 1) {
       const dateValue = `${year}/${month}/${i}`;
       const day = new Day({
         date: moment(dateValue, "jYYYY/jMM/jDD"),
@@ -314,7 +318,7 @@ class PrivateDatepicker {
 
     weeks.classList.add(options.classNames.weeksClassName);
 
-    for (let i = 0; i < weekName.length; i++) {
+    for (let i = 0; i < weekName.length; i += 1) {
       weeks.innerHTML += `<span class="${options.classNames.weekItemClassName}">${weekName[i]}</span>`;
     }
 
@@ -325,22 +329,22 @@ class PrivateDatepicker {
   };
 
   private goNextMonth = (): void => {
-    this.currentMonth = this.currentMonth !== 11 ? ++this.currentMonth : 0;
+    this.currentMonth = this.currentMonth !== 11 ? this.currentMonth + 1 : 0;
     if (this.currentMonth === 0) {
-      this.currentYear++;
+      this.currentYear += 1;
     }
     this.createElement();
   };
 
   private goPrevMonth = (): void => {
-    this.currentMonth = this.currentMonth !== 0 ? --this.currentMonth : 11;
+    this.currentMonth = this.currentMonth !== 0 ? this.currentMonth - 1 : 11;
     if (this.currentMonth === 11) {
-      this.currentYear--;
+      this.currentYear -= 1;
     }
     this.createElement();
   };
 
-  private onDayClick = () => {
+  private onDayClick = (): void => {
     const { options } = this;
 
     if (typeof options.onClick === "function") {
@@ -352,15 +356,15 @@ class PrivateDatepicker {
     }
   };
 
-  private setInRangeDates = (value: Array<Moment>) => {
+  private setInRangeDates = (value: Array<Moment>): void => {
     this.inRangeDates = value;
   };
 
-  private handleDaysState = () => {
+  private handleDaysState = (): void => {
     const { days, options } = this;
     this.validateDisabledDates();
 
-    for (let i = 0; i < days.length; i++) {
+    for (let i = 0; i < days.length; i += 1) {
       const day = days[i];
       day.updateDayState({
         minDate: this.minDate,
@@ -374,7 +378,7 @@ class PrivateDatepicker {
     }
   };
 
-  private handleOnClickEvent = (selectedDate: ISelectedDates) => {
+  private handleOnClickEvent = (selectedDate: ISelectedDates): void => {
     const { onClick } = this.options;
 
     if (!onClick) {
@@ -433,7 +437,7 @@ class PrivateDatepicker {
     date: Date | Moment | string,
     format?: string
   ): Moment => {
-    const finalFormat = format ? format : this.options.format;
+    const finalFormat = format || this.options.format;
 
     if (moment.isMoment(date) || date instanceof Date) {
       return moment(date, finalFormat);
@@ -470,7 +474,7 @@ class PrivateDatepicker {
     document.addEventListener("click", this.closeOnClickOutside);
   };
 
-  private closeOnClickOutside = (e: MouseEvent) => {
+  private closeOnClickOutside = (e: MouseEvent): void => {
     if (!this.isOpen) {
       return;
     }
@@ -481,7 +485,7 @@ class PrivateDatepicker {
     }
   };
 
-  public setValue = (dateValue?: Moment | Date | string) => {
+  public setValue = (dateValue?: Moment | Date | string): void => {
     const { options } = this;
 
     const momented = getValidatedMoment(dateValue, options.format);
@@ -520,32 +524,32 @@ class PrivateDatepicker {
           )) ||
         (startDate && endDate)
       ) {
-        const startDate = getValueObject(momented, options.format);
-        this.selectedDates = [startDate];
+        const newStartDate = getValueObject(momented, options.format);
+        this.selectedDates = [newStartDate];
         this.setElemValue(
-          startDate.momented.format(options.format) + options.rangeSeparator
+          newStartDate.momented.format(options.format) + options.rangeSeparator
         );
       } else if (
         !foundedSelectedDate &&
         momented.isBefore(this.selectedDates[0].momented)
       ) {
-        const startDate = getValueObject(momented, options.format);
-        this.selectedDates = [startDate];
-        this.inRangeDates = [startDate.momented.clone().add(1, "d")];
+        const newStartDate = getValueObject(momented, options.format);
+        this.selectedDates = [newStartDate];
+        this.inRangeDates = [newStartDate.momented.clone().add(1, "d")];
         this.setElemValue(
-          startDate.momented.format(options.format) + options.rangeSeparator
+          newStartDate.momented.format(options.format) + options.rangeSeparator
         );
       } else if (
         !foundedSelectedDate &&
         momented.isAfter(this.selectedDates[0].momented)
       ) {
-        const endDate = getValueObject(momented, options.format);
+        const newEndDate = getValueObject(momented, options.format);
         const diff = momented.diff(this.selectedDates[0].momented, "d") - 1;
-        let diffMomented = [];
+        const diffMomented: Moment[] = [];
         this.setTempMaxDate(undefined);
 
         if (diff > 0) {
-          for (let i = 1; i <= diff; i++) {
+          for (let i = 1; i <= diff; i += 1) {
             const momentedDiff = this.selectedDates[0].momented
               .clone()
               .add(i, "d");
@@ -554,11 +558,11 @@ class PrivateDatepicker {
         }
 
         this.inRangeDates = [...diffMomented];
-        this.selectedDates = [this.selectedDates[0], endDate];
+        this.selectedDates = [this.selectedDates[0], newEndDate];
         this.setElemValue(
           this.selectedDates[0].momented.format(options.format) +
             options.rangeSeparator +
-            endDate.momented.format(options.format)
+            newEndDate.momented.format(options.format)
         );
       }
     } else {
@@ -625,7 +629,7 @@ class PrivateDatepicker {
     });
   };
 
-  private isMonthOverflow = (additional: number = 0): boolean => {
+  private isMonthOverflow = (additional = 0): boolean => {
     return additional + this.currentMonth >= this.options.monthNames.length;
   };
 
@@ -639,15 +643,15 @@ class PrivateDatepicker {
     this.disabledDates = disabledDates.map((item) => {
       if (typeof item === "string") {
         return moment(item, format);
-      } else if (item instanceof Date) {
-        return moment(item);
-      } else {
-        return item;
       }
+      if (item instanceof Date) {
+        return moment(item);
+      }
+      return item;
     });
   };
 
-  private setTempMaxDate = (value: Moment | undefined) => {
+  private setTempMaxDate = (value: Moment | undefined): void => {
     this.tempMaxDate = value;
   };
 
@@ -701,6 +705,32 @@ class PrivateDatepicker {
     this.setValue(momented);
     this.createElement();
   };
+}
+
+class Datepicker {
+  public getValue: () => ISelectedDates;
+
+  public open: () => void;
+
+  public close: () => void;
+
+  public destroy: () => void;
+
+  public setDate: () => void;
+
+  /**
+   * Datepicker constructor params:
+   * @param elem the element css selector
+   * @param options Datepicker options
+   */
+  constructor(elem: string, options?: IOptions<Datepicker>) {
+    const datepicker = new PrivateDatepicker(elem, this, options);
+    this.getValue = datepicker.getValue;
+    this.open = datepicker.open;
+    this.close = datepicker.close;
+    this.destroy = datepicker.destroy;
+    this.setDate = datepicker.setDate;
+  }
 }
 
 export default Datepicker;

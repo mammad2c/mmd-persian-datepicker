@@ -1,2 +1,2 @@
-import MmdPersianDatepicker from '../src/Datepicker'
-new MmdPersianDatepicker('#mmd-picker')
+import MmdPersianDatepicker from "../src/components/Datepicker";
+new MmdPersianDatepicker("#mmd-picker");

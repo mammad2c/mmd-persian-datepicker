@@ -7,7 +7,7 @@ const siblings = (elem: HTMLElement | undefined | null): [HTMLElement] | null =>
     return null
   }
 
-  let matched: any = []
+  const matched: any = []
   let tempN: any = elem
 
   tempN = elem.previousSibling

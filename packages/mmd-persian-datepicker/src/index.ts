@@ -1,8 +1,5 @@
-import Datepicker from "./Datepicker";
+import Datepicker from "./components/Datepicker";
 
-// styles
-import "./styles/variables.scss";
-import "./styles/mixin.scss";
 import "./styles/Datepicker.scss";
 
 export {
@@ -12,6 +9,8 @@ export {
   ISelectedDates,
   disabledDates,
   mode,
-} from "./types";
+} from "./models/general";
+
 export { defaultOptionsValue } from "./configs/defaultOptionsValue";
+
 export default Datepicker;

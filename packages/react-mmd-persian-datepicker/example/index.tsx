@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 
 import MmdPersianDatepicker from "../src/ReactComponent";
 
-function App() {
+function App(): JSX.Element {
   return <MmdPersianDatepicker />;
 }
 

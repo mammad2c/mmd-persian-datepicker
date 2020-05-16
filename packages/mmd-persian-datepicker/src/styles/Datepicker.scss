@@ -1,6 +1,8 @@
+@import "./variables.scss";
+@import "./mixin.scss";
+
 .mmd-picker {
   position: absolute;
-  display: none;
   visibility: hidden;
   opacity: 0;
   transition: all 0.15s ease;
@@ -142,6 +144,7 @@
 
   &__day-item--disabled {
     opacity: 0.4;
+
     &:hover {
       color: initial;
       background: transparent !important;

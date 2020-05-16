@@ -1,5 +1,5 @@
-import { Moment } from 'moment-jalaali'
-import { ISelectedDateItem } from '../types'
+import { Moment } from "moment-jalaali";
+import { ISelectedDateItem } from "../models/general";
 
 const getValueObject = (date: Moment, format: string): ISelectedDateItem => {
   return {
@@ -7,7 +7,7 @@ const getValueObject = (date: Moment, format: string): ISelectedDateItem => {
     timestamp: date.toDate().getTime(),
     value: date.format(format),
     momented: date,
-  }
-}
+  };
+};
 
-export { getValueObject }
+export { getValueObject };

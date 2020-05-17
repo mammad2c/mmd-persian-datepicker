@@ -348,13 +348,13 @@ class PrivateDatepicker {
   };
 
   private onDayClick = (): void => {
-    const { options } = this;
+    const { onClick, autoClose } = this.options;
 
-    if (typeof options.onClick === "function") {
-      this.handleOnClickEvent(this.selectedDates);
+    if (typeof onClick === "function") {
+      onClick(this.selectedDates, this.pickerPrivater);
     }
 
-    if (options.autoClose) {
+    if (autoClose) {
       this.close();
     }
   };
@@ -379,16 +379,6 @@ class PrivateDatepicker {
         disabledDates: this.disabledDates,
       });
     }
-  };
-
-  private handleOnClickEvent = (selectedDate: ISelectedDates): void => {
-    const { onClick } = this.options;
-
-    if (!onClick) {
-      return;
-    }
-
-    onClick(selectedDate, this.pickerPrivater);
   };
 
   private getElemPosition = (): void => {
@@ -496,6 +486,7 @@ class PrivateDatepicker {
     if (!momented || !dateValue) {
       this.selectedDates = [];
       this.setElemValue("");
+      this.onChange();
       return;
     }
 
@@ -573,6 +564,7 @@ class PrivateDatepicker {
       this.setElemValue(momented.format(options.format));
     }
 
+    this.onChange();
     this.handleDaysState();
   };
 
@@ -708,6 +700,16 @@ class PrivateDatepicker {
     this.setValue(momented);
     this.createElement();
   };
+
+  public onChange = (): void => {
+    const { onChange } = this.options;
+
+    if (typeof onChange !== "function") {
+      return;
+    }
+
+    onChange(this.selectedDates, this.pickerPrivater);
+  };
 }
 
 class Datepicker {
@@ -721,6 +723,8 @@ class Datepicker {
 
   public setDate: () => void;
 
+  public onChange: () => void;
+
   /**
    * Datepicker constructor params:
    * @param elem the element css selector
@@ -733,6 +737,7 @@ class Datepicker {
     this.close = datepicker.close;
     this.destroy = datepicker.destroy;
     this.setDate = datepicker.setDate;
+    this.onChange = datepicker.onChange;
   }
 }
 

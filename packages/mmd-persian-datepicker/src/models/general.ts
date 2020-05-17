@@ -7,7 +7,7 @@ export interface ISelectedDateItem {
   momented: Moment;
 }
 
-export type ISelectedDates = Array<ISelectedDateItem>
+export type ISelectedDates = Array<ISelectedDateItem>;
 
 export interface IElemPosition {
   top: number;
@@ -66,4 +66,5 @@ export interface IOptions<T> {
   monthNames: Array<string>;
   // events:
   onClick?: (selectedDate: ISelectedDates, self: T) => void;
+  onChange?: (selectedDate: ISelectedDates, self: T) => void;
 }

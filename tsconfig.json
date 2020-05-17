@@ -13,10 +13,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "typeRoots": ["node_modules/@types"],
-    "baseUrl": ".",
-    "paths": {
-      "@mmd-package/*": ["packages/*/src"]
-    }
+    "baseUrl": "."
   },
   "exclude": ["node_modules", "packages/**/node_modules"]
 }

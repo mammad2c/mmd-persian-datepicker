@@ -13,6 +13,8 @@ import pkg from "./package.json";
 
 const isProduction = process.env.NODE_ENV === "production";
 
+const extensions = [".js", ".jsx", ".ts", ".tsx"];
+
 export default {
   input: `src/ReactComponent.tsx`,
   output: [
@@ -37,20 +39,25 @@ export default {
     // Allow json resolution
     json(),
     // Compile TypeScript files
-    typescript(),
+    typescript({
+      useTsconfigDeclarationDir: true,
+    }),
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
     commonjs(),
     // Allow node_modules resolution, so you can use 'external' to control
     // which external modules to include in the bundle
     // https://github.com/rollup/rollup-plugin-node-resolve#usage
-    resolve(),
+    resolve({
+      dedupe: ["mmd-persian-datepicker"],
+      extensions,
+    }),
     babel({
       presets: [
         "@babel/preset-env",
         "@babel/preset-typescript",
         "@babel/preset-react",
       ],
-      extensions: [".js", ".jsx", ".ts", ".tsx"],
+      extensions,
       plugins: [
         "@babel/plugin-proposal-class-properties",
         "@babel/transform-runtime",

@@ -33,6 +33,7 @@
     "build": "tsc --module commonjs && cross-env NODE_ENV=production rollup -c rollup.config.ts",
     "start": "yarn prebuild && rollup -c rollup.config.ts -w",
     "start:example": "parcel example/index.html",
+    "prepublish": "yarn build",
     "test": "jest --coverage",
     "test:watch": "jest --coverage --watch",
     "test:prod": "npm run lint && npm run test -- --no-cache",

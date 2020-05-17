@@ -4,7 +4,7 @@ import sourceMaps from "rollup-plugin-sourcemaps";
 import typescript from "rollup-plugin-typescript2";
 import json from "rollup-plugin-json";
 import postcss from "rollup-plugin-postcss";
-import { uglify } from "rollup-plugin-uglify";
+import { terser } from "rollup-plugin-terser";
 import postcssFlexbugsFixes from "postcss-flexbugs-fixes";
 import postcssPresetEnv from "postcss-preset-env";
 import path from "path";
@@ -63,6 +63,6 @@ export default {
       extract: path.resolve("dist/mmd-persian-datepicker.css"),
     }),
     sourceMaps(),
-    isProduction && uglify(),
+    isProduction && terser(),
   ],
 };

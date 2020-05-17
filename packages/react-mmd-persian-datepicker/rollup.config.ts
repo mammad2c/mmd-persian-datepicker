@@ -5,7 +5,7 @@ import babel from "rollup-plugin-babel";
 import typescript from "rollup-plugin-typescript2";
 import json from "rollup-plugin-json";
 import postcss from "rollup-plugin-postcss";
-import { uglify } from "rollup-plugin-uglify";
+import { terser } from "rollup-plugin-terser";
 import postcssFlexbugsFixes from "postcss-flexbugs-fixes";
 import postcssPresetEnv from "postcss-preset-env";
 import path from "path";
@@ -85,6 +85,6 @@ export default {
     }),
     // Resolve source maps to the original source
     sourceMaps(),
-    isProduction && uglify(),
+    isProduction && terser(),
   ],
 };

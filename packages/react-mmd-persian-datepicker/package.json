@@ -14,7 +14,7 @@
   ],
   "main": "dist/react-mmd-persian-datepicker.umd.js",
   "module": "dist/react-mmd-persian-datepicker.es5.js",
-  "typings": "dist/types/react-mmd-persian-datepicker.d.ts",
+  "typings": "dist/types/ReactComponent.d.ts",
   "files": [
     "dist"
   ],

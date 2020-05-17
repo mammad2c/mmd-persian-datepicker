@@ -14,7 +14,7 @@
   ],
   "main": "dist/mmd-persian-datepicker.umd.js",
   "module": "dist/mmd-persian-datepicker.es5.js",
-  "typings": "dist/types/mmd-persian-datepicker.d.ts",
+  "typings": "dist/types/index.d.ts",
   "files": [
     "dist"
   ],

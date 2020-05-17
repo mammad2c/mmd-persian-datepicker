@@ -1,6 +1,6 @@
 {
   "name": "react-mmd-persian-datepicker",
-  "version": "0.1.7",
+  "version": "0.1.71",
   "description": "React component for mmd-persian-datepicker",
   "keywords": [
     "datepicker",
@@ -76,7 +76,7 @@
     ]
   },
   "dependencies": {
-    "mmd-persian-datepicker": "^0.1.7",
+    "mmd-persian-datepicker": "^0.1.71",
     "react": "16.13.1",
     "react-dom": "^16.13.1"
   },

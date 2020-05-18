@@ -5,10 +5,10 @@ import "./styles/Datepicker.scss";
 export {
   IElemPosition,
   IOptions,
-  ISelectedDateItem,
   ISelectedDates,
   disabledDates,
   mode,
+  dateValue,
 } from "./models/general";
 
 export { defaultOptionsValue } from "./configs/defaultOptionsValue";

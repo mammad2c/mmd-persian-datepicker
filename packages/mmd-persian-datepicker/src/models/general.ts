@@ -1,13 +1,6 @@
 import { Moment } from "moment-jalaali";
 
-export interface ISelectedDateItem {
-  ISO: string;
-  timestamp: number;
-  value: any;
-  momented: Moment;
-}
-
-export type ISelectedDates = Array<ISelectedDateItem>;
+export type ISelectedDates = Array<Moment>;
 
 export interface IElemPosition {
   top: number;
@@ -18,9 +11,11 @@ export type mode = "single" | "range";
 
 export type disabledDates = Array<Moment | string | Date>;
 
+export type dateValue = Moment | Date | string;
+
 export interface IOptions<T> {
   // configs
-  defaultValue: Date | string | boolean;
+  defaultValue?: dateValue[] | dateValue | boolean;
   autoClose: boolean;
   mode: mode;
   multiple: boolean;

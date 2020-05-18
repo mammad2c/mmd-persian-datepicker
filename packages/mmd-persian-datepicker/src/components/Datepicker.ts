@@ -5,10 +5,9 @@ import {
   IElemPosition,
   IOptions,
   ISelectedDates,
-  ISelectedDateItem,
+  dateValue,
 } from "../models/general";
 import Day from "./Day";
-import { getValueObject } from "../utils/getValueObject";
 import { getValidatedMoment } from "../utils/getValidatedMoment";
 import { defaultOptionsValue } from "../configs/defaultOptionsValue";
 
@@ -39,7 +38,7 @@ class PrivateDatepicker {
 
   private selectedDates: ISelectedDates = [];
 
-  private inRangeDates: Array<ISelectedDateItem["momented"]> = [];
+  private inRangeDates: Array<Moment> = [];
 
   private timeoutTemp?: NodeJS.Timeout | number;
 
@@ -87,7 +86,15 @@ class PrivateDatepicker {
 
     const { minDate, defaultValue, format, maxDate } = this.options;
 
-    if (defaultValue) {
+    if (Array.isArray(defaultValue)) {
+      const momented: Array<Moment> = defaultValue
+        .map((item) => getValidatedMoment(item, this.options.format))
+        .filter((item) => (item === null ? false : true)) as Array<Moment>;
+
+      this.currentMonth = momented[0].jMonth();
+      this.currentYear = momented[0].jYear();
+      this.setValue(defaultValue);
+    } else if (defaultValue) {
       const momentedDefaultValue = this.getMomented(
         moment(
           typeof defaultValue === "boolean" ? new Date() : defaultValue
@@ -478,15 +485,68 @@ class PrivateDatepicker {
     }
   };
 
-  public setValue = (dateValue?: Moment | Date | string): void => {
+  public setValue = (
+    dateValue?: dateValue[] | dateValue,
+    triggerChange = true
+  ): void => {
     const { options } = this;
+
+    if (Array.isArray(dateValue)) {
+      const momented: Array<Moment> = dateValue
+        .map((item) => getValidatedMoment(item, options.format))
+        .filter((item) => (item === null ? false : true)) as Array<Moment>;
+
+      if (momented !== null) {
+        this.selectedDates = momented;
+
+        if (options.multiple) {
+          for (let i = 0; i < momented.length; i++) {
+            const element = momented[i];
+            this.setElemValue(
+              `${element.format(options.format)}${options.multipleSeparator}`
+            );
+          }
+        } else if (options.mode === "range" && momented.length > 1) {
+          const diff = momented[1].diff(momented[0], "d") - 1;
+          const diffMomented: Moment[] = [];
+          this.setTempMaxDate(undefined);
+
+          if (diff > 0) {
+            for (let i = 1; i <= diff; i += 1) {
+              const momentedDiff = momented[0].clone().add(i, "d");
+              diffMomented.push(momentedDiff);
+            }
+          }
+
+          this.inRangeDates = [...diffMomented];
+
+          this.setElemValue(
+            momented[0].format(options.format) +
+              options.rangeSeparator +
+              momented[1].format(options.format)
+          );
+        } else {
+          this.setElemValue(momented[0].format(options.format));
+        }
+
+        if (triggerChange) {
+          this.onChange();
+        }
+
+        return;
+      } else {
+        throw new Error("Please provide valid selected date");
+      }
+    }
 
     const momented = getValidatedMoment(dateValue, options.format);
 
     if (!momented || !dateValue) {
       this.selectedDates = [];
       this.setElemValue("");
-      this.onChange();
+      if (triggerChange) {
+        this.onChange();
+      }
       return;
     }
 
@@ -494,13 +554,13 @@ class PrivateDatepicker {
 
     if (options.multiple) {
       if (!foundedSelectedDate) {
-        this.selectedDates.push(getValueObject(momented, options.format));
+        this.selectedDates.push(momented);
         this.addElemValue(
           `${momented.format(options.format)}${options.multipleSeparator}`
         );
       } else {
         this.selectedDates = this.selectedDates.filter((item) =>
-          item.momented.isSame(momented)
+          item.isSame(momented)
         );
         this.replaceElemValue(
           `${momented.format(options.format)}${options.multipleSeparator}`,
@@ -512,59 +572,54 @@ class PrivateDatepicker {
       const endDate = this.selectedDates[1];
       if (
         this.selectedDates.length === 0 ||
-        (foundedSelectedDate &&
-          foundedSelectedDate.momented.isSame(
-            this.selectedDates[0].momented
-          )) ||
+        (foundedSelectedDate && foundedSelectedDate.isSame(startDate, "d")) ||
         (startDate && endDate)
       ) {
-        const newStartDate = getValueObject(momented, options.format);
-        this.selectedDates = [newStartDate];
+        this.selectedDates = [momented];
         this.setElemValue(
-          newStartDate.momented.format(options.format) + options.rangeSeparator
+          momented.format(options.format) + options.rangeSeparator
         );
       } else if (
         !foundedSelectedDate &&
-        momented.isBefore(this.selectedDates[0].momented)
+        momented.isBefore(this.selectedDates[0], "d")
       ) {
-        const newStartDate = getValueObject(momented, options.format);
-        this.selectedDates = [newStartDate];
-        this.inRangeDates = [newStartDate.momented.clone().add(1, "d")];
+        this.selectedDates = [];
+        this.inRangeDates = [momented.clone().add(1, "d")];
         this.setElemValue(
-          newStartDate.momented.format(options.format) + options.rangeSeparator
+          momented.format(options.format) + options.rangeSeparator
         );
       } else if (
         !foundedSelectedDate &&
-        momented.isAfter(this.selectedDates[0].momented)
+        momented.isAfter(this.selectedDates[0])
       ) {
-        const newEndDate = getValueObject(momented, options.format);
-        const diff = momented.diff(this.selectedDates[0].momented, "d") - 1;
+        const diff = momented.diff(this.selectedDates[0], "d") - 1;
         const diffMomented: Moment[] = [];
         this.setTempMaxDate(undefined);
 
         if (diff > 0) {
           for (let i = 1; i <= diff; i += 1) {
-            const momentedDiff = this.selectedDates[0].momented
-              .clone()
-              .add(i, "d");
+            const momentedDiff = this.selectedDates[0].clone().add(i, "d");
             diffMomented.push(momentedDiff);
           }
         }
 
         this.inRangeDates = [...diffMomented];
-        this.selectedDates = [this.selectedDates[0], newEndDate];
+        this.selectedDates = [this.selectedDates[0], momented];
         this.setElemValue(
-          this.selectedDates[0].momented.format(options.format) +
+          this.selectedDates[0].format(options.format) +
             options.rangeSeparator +
-            newEndDate.momented.format(options.format)
+            momented.format(options.format)
         );
       }
     } else {
-      this.selectedDates[0] = getValueObject(momented, options.format);
+      this.selectedDates[0] = momented;
       this.setElemValue(momented.format(options.format));
     }
 
-    this.onChange();
+    if (triggerChange) {
+      this.onChange();
+    }
+
     this.handleDaysState();
   };
 
@@ -598,7 +653,7 @@ class PrivateDatepicker {
 
   private findSelectedDate = (
     dateValue: Moment | string
-  ): ISelectedDateItem | undefined => {
+  ): Moment | undefined => {
     const { selectedDates } = this;
 
     const momented = moment.isMoment(dateValue)
@@ -606,13 +661,13 @@ class PrivateDatepicker {
       : this.getMomented(dateValue);
 
     return selectedDates.find((item) => {
-      return momented.isSame(item.momented);
+      return momented.isSame(item);
     });
   };
 
   private findInRangeDate = (
     dateValue: Moment | string
-  ): ISelectedDateItem["momented"] | undefined => {
+  ): Moment | undefined => {
     const { inRangeDates } = this;
 
     const momented = moment.isMoment(dateValue)
@@ -687,9 +742,27 @@ class PrivateDatepicker {
     this.calendarElem.remove();
   };
 
-  public setDate = (dateValue?: Moment | Date | string): void => {
-    const { format } = this.options;
-    const momented = getValidatedMoment(dateValue, format);
+  public setDate = (
+    dateValue?: dateValue[] | dateValue,
+    triggerChange = true,
+    format?: string
+  ): void => {
+    const finalFormat = format || this.options.format;
+
+    if (Array.isArray(dateValue)) {
+      const momented = dateValue
+        .map((item) => getValidatedMoment(item, finalFormat))
+        .filter((item) => (item === null ? false : true)) as Array<Moment>;
+
+      this.currentMonth = momented[0].jMonth();
+      this.currentYear = momented[0].jYear();
+      this.setValue(momented, triggerChange);
+      this.createElement();
+
+      return;
+    }
+
+    const momented = getValidatedMoment(dateValue, finalFormat);
 
     if (!momented) {
       throw new Error("Please provide valid date");
@@ -697,7 +770,7 @@ class PrivateDatepicker {
 
     this.currentMonth = momented.jMonth();
     this.currentYear = momented.jYear();
-    this.setValue(momented);
+    this.setValue(momented, triggerChange);
     this.createElement();
   };
 
@@ -721,7 +794,11 @@ class Datepicker {
 
   public destroy: () => void;
 
-  public setDate: () => void;
+  public setDate: (
+    dateValue?: dateValue[] | dateValue,
+    triggerChange?: boolean,
+    format?: string
+  ) => void;
 
   public onChange: () => void;
 

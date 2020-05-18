@@ -1,14 +1,13 @@
 import moment, { Moment } from "moment-jalaali";
 import { constants } from "../configs/constants";
-import { getValueObject } from "../utils/getValueObject";
-import { ISelectedDateItem, mode, ISelectedDates } from "../models/general";
+import { mode, ISelectedDates } from "../models/general";
 
 interface IDay {
   date: Moment;
   selectedDates: ISelectedDates;
   minDate?: Moment;
   maxDate?: Moment;
-  onClick?: (params: ISelectedDateItem) => void;
+  onClick?: (params: Moment) => void;
   today: Moment;
   isDisabled?: boolean;
   setValue: (dateValue: string | moment.Moment) => void;
@@ -16,12 +15,8 @@ interface IDay {
   mode: mode;
   format: string;
   multiple: boolean;
-  findSelectedDate: (
-    dateValue: Moment | string
-  ) => ISelectedDateItem | undefined;
-  findInRangeDate: (
-    dateValue: Moment | string
-  ) => ISelectedDateItem["momented"] | undefined;
+  findSelectedDate: (dateValue: Moment | string) => Moment | undefined;
+  findInRangeDate: (dateValue: Moment | string) => Moment | undefined;
   handleDaysState: () => void;
   disabledDates: Array<Moment>;
   setTempMaxDate: (value: Moment | undefined) => void;
@@ -159,7 +154,7 @@ class Day {
     setValue(date);
 
     if (typeof onClick === "function") {
-      onClick(getValueObject(date, format));
+      onClick(date);
     }
   };
 
@@ -184,13 +179,13 @@ class Day {
       return;
     }
 
-    const diff = date.diff(startDate.momented, "d");
+    const diff = date.diff(startDate, "d");
     const diffMomented: Moment[] = [];
     let maxDate: Moment | undefined;
 
     if (diff > 0) {
       for (let i = 1; i <= diff; i++) {
-        const momentedDiff = startDate.momented.clone().add(i, "d");
+        const momentedDiff = startDate.clone().add(i, "d");
 
         if (disabledDates && disabledDates.length !== 0) {
           let j = 0;

@@ -1,7 +1,8 @@
 import React, { RefObject, ComponentType } from "react";
-import MmdPersianDatepicker from "mmd-persian-datepicker/src/components/Datepicker";
-import { defaultOptionsValue } from "mmd-persian-datepicker/src/configs/defaultOptionsValue";
-import { IOptions } from "mmd-persian-datepicker/src/models/general";
+import MmdPersianDatepicker, {
+  defaultOptionsValue,
+  IOptions,
+} from "mmd-persian-datepicker/src";
 
 interface Props extends IOptions<MmdPersianDatepicker> {
   inputProps?: React.DetailedHTMLProps<
@@ -20,7 +21,9 @@ class ReactComponent extends React.Component<Props> {
     const isElementExist = this.element.current;
 
     if (isElementExist) {
-      this.instance = new MmdPersianDatepicker(isElementExist, this.props);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { inputProps, InputComponent, ...restProps } = this.props;
+      this.instance = new MmdPersianDatepicker(isElementExist, restProps);
     }
   };
 
@@ -34,6 +37,19 @@ class ReactComponent extends React.Component<Props> {
 
   public componentDidMount(): void {
     this.createInstance();
+  }
+
+  public componentDidUpdate(prevProps: Props): void {
+    const { defaultValue } = this.props;
+
+    if (
+      prevProps.defaultValue === defaultValue ||
+      typeof defaultValue === "boolean"
+    ) {
+      return;
+    }
+
+    this.instance?.setDate(defaultValue, false);
   }
 
   public componentWillUnmount(): void {

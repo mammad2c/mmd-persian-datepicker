@@ -576,6 +576,7 @@ class PrivateDatepicker {
         (startDate && endDate)
       ) {
         this.selectedDates = [momented];
+        this.inRangeDates = [momented.clone().add(1, "d")];
         this.setElemValue(
           momented.format(options.format) + options.rangeSeparator
         );
@@ -754,8 +755,17 @@ class PrivateDatepicker {
         .map((item) => getValidatedMoment(item, finalFormat))
         .filter((item) => (item === null ? false : true)) as Array<Moment>;
 
-      this.currentMonth = momented[0].jMonth();
-      this.currentYear = momented[0].jYear();
+      if (
+        this.options.mode === "range" &&
+        momented.length === 2 &&
+        (momented[0].jMonth() !== this.currentMonth ||
+          momented[0].jYear() !== this.currentYear) &&
+        (momented[1].jMonth() - 1 !== this.currentMonth ||
+          momented[1].jYear() !== this.currentYear)
+      ) {
+        this.currentMonth = momented[0].jMonth();
+        this.currentYear = momented[0].jYear();
+      }
       this.setValue(momented, triggerChange);
       this.createElement();
 

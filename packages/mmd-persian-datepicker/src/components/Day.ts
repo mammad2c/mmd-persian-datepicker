@@ -122,7 +122,6 @@ class Day {
       setValue,
       mode,
       onClick,
-      format,
       setInRangeDates,
       disabledDates,
     } = this;
@@ -180,6 +179,11 @@ class Day {
     }
 
     const diff = date.diff(startDate, "d");
+
+    if (diff === 0) {
+      return;
+    }
+
     const diffMomented: Moment[] = [];
     let maxDate: Moment | undefined;
 

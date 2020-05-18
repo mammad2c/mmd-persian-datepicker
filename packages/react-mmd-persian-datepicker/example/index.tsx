@@ -25,6 +25,9 @@ function App(): JSX.Element {
           inline
           defaultValue={date}
           onChange={(selectedDates) => {
+            if (!selectedDates) {
+              return;
+            }
             setDate(selectedDates);
           }}
         />

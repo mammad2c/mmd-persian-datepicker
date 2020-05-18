@@ -40,7 +40,7 @@ class ReactComponent extends React.Component<Props> {
   }
 
   public componentDidUpdate(prevProps: Props): void {
-    const { defaultValue } = this.props;
+    const { defaultValue, mode, multiple } = this.props;
 
     if (
       prevProps.defaultValue === defaultValue ||
@@ -48,7 +48,6 @@ class ReactComponent extends React.Component<Props> {
     ) {
       return;
     }
-
     this.instance?.setDate(defaultValue, false);
   }
 

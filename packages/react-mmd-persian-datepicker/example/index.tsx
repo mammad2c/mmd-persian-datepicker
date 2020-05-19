@@ -17,7 +17,7 @@ function App(): JSX.Element {
           marginBottom: 30,
         }}
       >
-        <button onClick={() => setDate(["1399/05/25", "1399/05/28"])}>
+        <button onClick={(): void => setDate(["1399/05/25", "1399/05/28"])}>
           setDate Value
         </button>
         <button onClick={(): void => setActive(!active)}>Toggle active</button>

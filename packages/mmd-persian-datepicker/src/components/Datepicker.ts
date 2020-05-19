@@ -526,7 +526,11 @@ class PrivateDatepicker {
               momented[1].format(options.format)
           );
         } else {
-          this.setElemValue(momented[0].format(options.format));
+          if (momented[0]) {
+            this.setElemValue(momented[0].format(options.format));
+          } else {
+            this.setElemValue("");
+          }
         }
 
         if (triggerChange) {

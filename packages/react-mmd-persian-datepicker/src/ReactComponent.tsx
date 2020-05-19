@@ -1,4 +1,4 @@
-import React, { RefObject, ComponentType } from "react";
+import React, { RefObject } from "react";
 import MmdPersianDatepicker, {
   defaultOptionsValue,
   IOptions,
@@ -9,21 +9,22 @@ interface Props extends IOptions<MmdPersianDatepicker> {
     React.InputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
   >;
-  InputComponent?: ComponentType;
+  customRender?: (
+    inputProps: Props["inputProps"],
+    ref: (node: RefObject<HTMLInputElement>) => any
+  ) => JSX.Element;
 }
 
 class ReactComponent extends React.Component<Props> {
   static defaultProps = defaultOptionsValue;
   private instance?: MmdPersianDatepicker;
-  private element = React.createRef<HTMLElement>();
+  private element?: HTMLElement;
 
   private createInstance = (): void => {
-    const isElementExist = this.element.current;
-
-    if (isElementExist) {
+    if (this.element) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { inputProps, InputComponent, ...restProps } = this.props;
-      this.instance = new MmdPersianDatepicker(isElementExist, restProps);
+      const { inputProps, customRender, ...restProps } = this.props;
+      this.instance = new MmdPersianDatepicker(this.element, restProps);
     }
   };
 
@@ -35,12 +36,25 @@ class ReactComponent extends React.Component<Props> {
     this.instance.destroy();
   };
 
+  private handleRef = (node) => {
+    if (this.element) {
+      return;
+    }
+
+    this.element = node;
+
+    if (this.instance) {
+      this.destroyInstance();
+    }
+    this.createInstance();
+  };
+
   public componentDidMount(): void {
     this.createInstance();
   }
 
   public componentDidUpdate(prevProps: Props): void {
-    const { defaultValue, mode, multiple } = this.props;
+    const { defaultValue } = this.props;
 
     if (
       prevProps.defaultValue === defaultValue ||
@@ -56,22 +70,17 @@ class ReactComponent extends React.Component<Props> {
   }
 
   public render(): JSX.Element {
-    const { inline, inputProps, InputComponent } = this.props;
+    const { inline, inputProps, customRender } = this.props;
 
     if (inline) {
-      return <div ref={this.element as RefObject<HTMLDivElement>}></div>;
+      return <div ref={this.handleRef}></div>;
     }
 
-    if (InputComponent) {
-      return <InputComponent />;
+    if (customRender) {
+      return customRender(inputProps, this.handleRef);
     }
 
-    return (
-      <input
-        {...inputProps}
-        ref={this.element as RefObject<HTMLInputElement>}
-      />
-    );
+    return <input {...inputProps} ref={this.handleRef} />;
   }
 }
 

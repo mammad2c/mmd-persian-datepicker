@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import MmdPersianDatepicker from "../src/ReactComponent";
 
+function CustomInput({ inputRef, ...props }: any) {
+  return <input {...props} ref={inputRef} />;
+}
+
 function App(): JSX.Element {
   const [active, setActive] = useState(true);
   const [date, setDate] = useState<any>();
@@ -22,7 +26,9 @@ function App(): JSX.Element {
         <MmdPersianDatepicker
           mode="range"
           numberOfMonths={2}
-          inline
+          customRender={(inputProps, ref) => {
+            return <CustomInput {...inputProps} inputRef={ref} />;
+          }}
           defaultValue={date}
           onChange={(selectedDates) => {
             if (!selectedDates) {

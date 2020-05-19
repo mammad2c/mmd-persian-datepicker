@@ -11,7 +11,7 @@ interface Props extends IOptions<MmdPersianDatepicker> {
   >;
   customRender?: (
     inputProps: Props["inputProps"],
-    ref: (node: RefObject<HTMLInputElement>) => any
+    ref: (node: RefObject<HTMLInputElement>) => void
   ) => JSX.Element;
 }
 
@@ -36,7 +36,7 @@ class ReactComponent extends React.Component<Props> {
     this.instance.destroy();
   };
 
-  private handleRef = (node) => {
+  private handleRef = (node: any): void => {
     if (this.element) {
       return;
     }
@@ -45,8 +45,8 @@ class ReactComponent extends React.Component<Props> {
 
     if (this.instance) {
       this.destroyInstance();
+      this.createInstance();
     }
-    this.createInstance();
   };
 
   public componentDidMount(): void {

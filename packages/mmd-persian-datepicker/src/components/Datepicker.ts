@@ -20,8 +20,6 @@ class PrivateDatepicker {
   private pickerPrivater: Datepicker;
 
   // rests
-  private elemId?: string;
-
   private elemPosition?: IElemPosition;
 
   private calendarElem: HTMLElement;
@@ -59,7 +57,6 @@ class PrivateDatepicker {
     pickerPrivater: Datepicker,
     options?: IOptions<Datepicker>
   ) {
-    this.elemId = typeof elem === "string" ? elem : undefined;
     const elemExist =
       typeof elem === "string"
         ? (document.querySelector(elem) as HTMLElement)
@@ -394,48 +391,20 @@ class PrivateDatepicker {
   };
 
   private getElemPosition = (): void => {
-    /**
-     * calculation element top and left based on jquery offset :)
-     */
-    const rect: ClientRect | DOMRect = this.elem.getBoundingClientRect();
-    const elemWin =
-      this.elem.ownerDocument &&
-      this.elem.ownerDocument.defaultView &&
-      this.elem.ownerDocument.defaultView;
-
-    if (!elemWin) throw Error(`${this.elemId} not found`);
+    const elemRect = this.elem.getBoundingClientRect();
 
     this.elemPosition = {
-      top: rect.top - elemWin.pageYOffset,
-      left: rect.left - elemWin.pageXOffset,
+      top: elemRect.top + elemRect.height,
+      left: elemRect.left,
     };
   };
 
   private setPosition = (): void => {
     this.getElemPosition();
     if (!this.elemPosition) return;
-
     const { left, top } = this.elemPosition;
-    const { offsetWidth, offsetHeight } = this.elem;
-    const direction = document.dir;
-    const clientWidth =
-      document.documentElement && document.documentElement.clientWidth;
-
-    if (!clientWidth) throw Error("item not found");
-
-    const scrollBarWidthTemp = window.innerWidth - clientWidth;
-    const scrollBarWidth = scrollBarWidthTemp < 0 ? 0 : scrollBarWidthTemp;
-
-    this.calendarElem.style[direction === "rtl" ? "right" : "left"] =
-      direction === "rtl"
-        ? ` ${
-            window.innerWidth -
-            scrollBarWidth -
-            (this.elem.offsetLeft + offsetWidth)
-          }px`
-        : `${left}px`;
-
-    this.calendarElem.style.top = `${offsetHeight + top}px`;
+    this.calendarElem.style.top = `${top}px`;
+    this.calendarElem.style.left = `${left}px`;
   };
 
   private getMomented = (

@@ -394,7 +394,7 @@ class PrivateDatepicker {
     const elemRect = this.elem.getBoundingClientRect();
 
     this.elemPosition = {
-      top: elemRect.top + elemRect.height,
+      top: elemRect.top + elemRect.height + window.pageYOffset,
       left: elemRect.left,
     };
   };

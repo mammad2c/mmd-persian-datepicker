@@ -404,7 +404,7 @@ class PrivateDatepicker {
     if (!this.elemPosition) return;
     const { left, top } = this.elemPosition;
     this.calendarElem.style.top = `${top}px`;
-    this.calendarElem.style.left = `${left}px`;
+    this.calendarElem.style.right = `${left}px`;
   };
 
   private getMomented = (

@@ -1,17 +1,26 @@
 @import "./variables.scss";
 @import "./mixin.scss";
 
+@keyframes animateIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .mmd-picker {
   position: absolute;
-  visibility: hidden;
-  opacity: 0;
   transition: all 0.15s ease;
   background: $mmdBackground;
   box-shadow: 0 1px 7px rgba($color: #000000, $alpha: 0.1);
   border-radius: 4px;
   direction: rtl;
-  display: flex;
-  transform: translateY(-10px);
+  display: none;
   max-width: ($pickerWidth * 2) + $multipleMonthGutter;
   font-size: 16px;
 
@@ -41,9 +50,7 @@
   }
 
   &--open-animated {
-    visibility: visible;
-    opacity: 1;
-    transform: none;
+    animation: animateIn 0.3s;
   }
 
   &__month-wrapper {

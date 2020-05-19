@@ -175,10 +175,15 @@ class PrivateDatepicker {
   private createElement = (): void => {
     const { classNames, numberOfMonths, inline } = this.options;
 
-    this.calendarElem.setAttribute(
-      "id",
-      `${this.elem.getAttribute("id")}-calendar`
-    );
+    const id = this.elem.getAttribute("id");
+
+    if (id) {
+      this.calendarElem.setAttribute(
+        "id",
+        `${this.elem.getAttribute("id")}-calendar`
+      );
+    }
+
     this.calendarElem.classList.add(classNames.baseClassName);
 
     if (inline) {
@@ -588,7 +593,7 @@ class PrivateDatepicker {
         !foundedSelectedDate &&
         momented.isBefore(this.selectedDates[0], "d")
       ) {
-        this.selectedDates = [];
+        this.selectedDates = [momented];
         this.inRangeDates = [momented.clone().add(1, "d")];
         this.setElemValue(
           momented.format(options.format) + options.rangeSeparator

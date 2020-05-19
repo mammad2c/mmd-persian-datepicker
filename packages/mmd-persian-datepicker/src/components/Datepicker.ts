@@ -22,6 +22,8 @@ class PrivateDatepicker {
   // rests
   private elemPosition?: IElemPosition;
 
+  private wrapperElem: HTMLElement;
+
   private calendarElem: HTMLElement;
 
   private today: Moment;
@@ -70,6 +72,7 @@ class PrivateDatepicker {
 
     this.options = Object.assign(defaultOptionsValue, options);
     this.pickerPrivater = pickerPrivater;
+    this.wrapperElem = document.createElement("div");
     this.calendarElem = document.createElement("div");
     this.today = moment(new Date());
     this.todayMonth = this.today.jMonth();
@@ -181,7 +184,13 @@ class PrivateDatepicker {
       );
     }
 
+    const dir = document.dir;
+
+    this.wrapperElem.classList.add(this.options.classNames.wrapperClassName);
     this.calendarElem.classList.add(classNames.baseClassName);
+    this.calendarElem.classList.add(
+      dir === "rtl" ? classNames.rtlClassName : classNames.ltrClassName
+    );
 
     if (inline) {
       this.calendarElem.classList.add(classNames.inlineClassName);
@@ -210,7 +219,8 @@ class PrivateDatepicker {
     if (inline) {
       this.elem.appendChild(this.calendarElem);
     } else {
-      document.body.appendChild(this.calendarElem);
+      this.wrapperElem.appendChild(this.calendarElem);
+      document.body.appendChild(this.wrapperElem);
     }
 
     this.handleDaysState();
@@ -393,18 +403,24 @@ class PrivateDatepicker {
   private getElemPosition = (): void => {
     const elemRect = this.elem.getBoundingClientRect();
 
+    const dir = document.dir;
+
     this.elemPosition = {
-      top: elemRect.top + elemRect.height + window.pageYOffset,
-      left: elemRect.left,
+      y: elemRect.bottom + window.pageYOffset,
+      x: dir === "rtl" ? elemRect.right : elemRect.left,
     };
   };
 
   private setPosition = (): void => {
     this.getElemPosition();
+
     if (!this.elemPosition) return;
-    const { left, top } = this.elemPosition;
-    this.calendarElem.style.top = `${top}px`;
-    this.calendarElem.style.right = `${left}px`;
+
+    const { x, y } = this.elemPosition;
+    const dir = document.dir;
+
+    this.wrapperElem.style.top = `${y}px`;
+    this.wrapperElem.style.left = `${x}px`;
   };
 
   private getMomented = (

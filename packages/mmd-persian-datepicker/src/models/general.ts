@@ -3,8 +3,8 @@ import { Moment } from "moment-jalaali";
 export type ISelectedDates = Array<Moment>;
 
 export interface IElemPosition {
-  top: number;
-  left: number;
+  x: number;
+  y: number;
 }
 
 export type mode = "single" | "range";
@@ -29,9 +29,12 @@ export interface IOptions<T> {
   disabledDates: disabledDates;
   inline: boolean;
   classNames: {
+    wrapperClassName: string;
     baseClassName: string;
     inlineClassName: string;
     monthWrapperClassName: string;
+    rtlClassName: string;
+    ltrClassName: string;
     // headers class name:
     headerClassName: string;
     arrowsClassName: string;

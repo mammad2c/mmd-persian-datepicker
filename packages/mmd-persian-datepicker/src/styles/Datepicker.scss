@@ -13,6 +13,10 @@
   }
 }
 
+.mmd-wrapper {
+  position: absolute;
+}
+
 .mmd-picker {
   position: absolute;
   transition: all 0.15s ease;
@@ -23,6 +27,14 @@
   display: none;
   max-width: ($pickerWidth * 2) + $multipleMonthGutter;
   font-size: 16px;
+
+  &--rtl {
+    right: 0;
+  }
+
+  &--left {
+    left: 0;
+  }
 
   *,
   *::before,

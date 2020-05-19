@@ -17,9 +17,12 @@ export const defaultOptionsValue: IOptions<Datepicker> = {
   disabledDates: [],
   inline: false,
   classNames: {
+    wrapperClassName: constants.wrapperClassName,
     baseClassName: constants.baseClassName,
     inlineClassName: constants.inlineClassName,
     monthWrapperClassName: constants.monthWrapperClassName,
+    rtlClassName: constants.rtlClassName,
+    ltrClassName: constants.ltrClassName,
     // headers class name:
     headerClassName: constants.headerClassName,
     arrowsClassName: constants.arrowsClassName,

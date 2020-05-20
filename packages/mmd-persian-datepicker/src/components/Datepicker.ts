@@ -70,7 +70,7 @@ class PrivateDatepicker {
       this.elem = elemExist;
     }
 
-    this.options = Object.assign(defaultOptionsValue, options);
+    this.options = Object.assign({}, defaultOptionsValue, options);
     this.pickerPrivater = pickerPrivater;
     this.wrapperElem = document.createElement("div");
     this.calendarElem = document.createElement("div");
@@ -417,7 +417,6 @@ class PrivateDatepicker {
     if (!this.elemPosition) return;
 
     const { x, y } = this.elemPosition;
-    const dir = document.dir;
 
     this.wrapperElem.style.top = `${y}px`;
     this.wrapperElem.style.left = `${x}px`;

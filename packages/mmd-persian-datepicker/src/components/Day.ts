@@ -317,6 +317,7 @@ class Day {
     selectedDates,
     isDisabled,
     format,
+    disabledDates,
     multiple,
   }: IDayUpdate): void => {
     this.mode = mode;
@@ -326,6 +327,7 @@ class Day {
     this.format = format;
     this.multiple = multiple;
     this.isDisabled = isDisabled;
+    this.disabledDates = disabledDates;
     this.handleDisable();
     this.handleClassNames();
     this.handleListeners();

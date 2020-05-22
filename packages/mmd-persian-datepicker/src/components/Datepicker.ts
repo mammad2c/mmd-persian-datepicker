@@ -490,6 +490,88 @@ class PrivateDatepicker {
     }
   };
 
+  private setElemValue = (str: any): void => {
+    if (this.options.inline) {
+      return;
+    }
+
+    if (this.elem instanceof HTMLInputElement) {
+      this.elem.value = str;
+    } else {
+      this.elem.innerHTML = str;
+    }
+  };
+
+  private replaceElemValue = (search: string, replace: string): void => {
+    if (this.elem instanceof HTMLInputElement) {
+      this.elem.value = this.elem.value.replace(search, replace);
+    } else {
+      this.elem.innerHTML = this.elem.innerHTML.replace(search, replace);
+    }
+  };
+
+  private addElemValue = (str: string): void => {
+    if (this.elem instanceof HTMLInputElement) {
+      this.elem.value += str;
+    } else {
+      this.elem.innerHTML += str;
+    }
+  };
+
+  private findSelectedDate = (
+    dateValue: Moment | string
+  ): Moment | undefined => {
+    const { selectedDates } = this;
+
+    const momented = moment.isMoment(dateValue)
+      ? dateValue
+      : this.getMomented(dateValue);
+
+    return selectedDates.find((item) => {
+      return momented.isSame(item);
+    });
+  };
+
+  private findInRangeDate = (
+    dateValue: Moment | string
+  ): Moment | undefined => {
+    const { inRangeDates } = this;
+
+    const momented = moment.isMoment(dateValue)
+      ? dateValue
+      : this.getMomented(dateValue);
+
+    return inRangeDates.find((item) => {
+      return momented.isSame(item);
+    });
+  };
+
+  private isMonthOverflow = (additional = 0): boolean => {
+    return additional + this.currentMonth >= this.options.monthNames.length;
+  };
+
+  private validateDisabledDates = (): void => {
+    const { disabledDates, format } = this.options;
+
+    if (!disabledDates || disabledDates.length === 0) {
+      return;
+    }
+
+    this.disabledDates = disabledDates.map((item) => {
+      if (typeof item === "string") {
+        return moment(item, format);
+      }
+      if (item instanceof Date) {
+        return moment(item);
+      }
+      return item;
+    });
+  };
+
+  private setTempMaxDate = (value: Moment | undefined): void => {
+    this.tempMaxDate = value;
+  };
+
   public setValue = (
     dateValue?: dateValue[] | dateValue,
     triggerChange = true
@@ -633,88 +715,6 @@ class PrivateDatepicker {
     this.handleDaysState();
   };
 
-  private setElemValue = (str: any): void => {
-    if (this.options.inline) {
-      return;
-    }
-
-    if (this.elem instanceof HTMLInputElement) {
-      this.elem.value = str;
-    } else {
-      this.elem.innerHTML = str;
-    }
-  };
-
-  private replaceElemValue = (search: string, replace: string): void => {
-    if (this.elem instanceof HTMLInputElement) {
-      this.elem.value = this.elem.value.replace(search, replace);
-    } else {
-      this.elem.innerHTML = this.elem.innerHTML.replace(search, replace);
-    }
-  };
-
-  private addElemValue = (str: string): void => {
-    if (this.elem instanceof HTMLInputElement) {
-      this.elem.value += str;
-    } else {
-      this.elem.innerHTML += str;
-    }
-  };
-
-  private findSelectedDate = (
-    dateValue: Moment | string
-  ): Moment | undefined => {
-    const { selectedDates } = this;
-
-    const momented = moment.isMoment(dateValue)
-      ? dateValue
-      : this.getMomented(dateValue);
-
-    return selectedDates.find((item) => {
-      return momented.isSame(item);
-    });
-  };
-
-  private findInRangeDate = (
-    dateValue: Moment | string
-  ): Moment | undefined => {
-    const { inRangeDates } = this;
-
-    const momented = moment.isMoment(dateValue)
-      ? dateValue
-      : this.getMomented(dateValue);
-
-    return inRangeDates.find((item) => {
-      return momented.isSame(item);
-    });
-  };
-
-  private isMonthOverflow = (additional = 0): boolean => {
-    return additional + this.currentMonth >= this.options.monthNames.length;
-  };
-
-  private validateDisabledDates = (): void => {
-    const { disabledDates, format } = this.options;
-
-    if (!disabledDates || disabledDates.length === 0) {
-      return;
-    }
-
-    this.disabledDates = disabledDates.map((item) => {
-      if (typeof item === "string") {
-        return moment(item, format);
-      }
-      if (item instanceof Date) {
-        return moment(item);
-      }
-      return item;
-    });
-  };
-
-  private setTempMaxDate = (value: Moment | undefined): void => {
-    this.tempMaxDate = value;
-  };
-
   public open = (): void => {
     if (this.isOpen) return;
 
@@ -804,6 +804,12 @@ class PrivateDatepicker {
 
     onChange(this.selectedDates, this.pickerPrivater);
   };
+
+  public setOptions = (options: IOptions<Datepicker>): void => {
+    Object.assign(this.options, options);
+    this.validateDisabledDates();
+    this.handleDaysState();
+  };
 }
 
 class Datepicker {
@@ -821,6 +827,8 @@ class Datepicker {
     format?: string
   ) => void;
 
+  public setOptions: (options: IOptions<Datepicker>) => void;
+
   public onChange: () => void;
 
   /**
@@ -836,6 +844,7 @@ class Datepicker {
     this.destroy = datepicker.destroy;
     this.setDate = datepicker.setDate;
     this.onChange = datepicker.onChange;
+    this.setOptions = datepicker.setOptions;
   }
 }
 

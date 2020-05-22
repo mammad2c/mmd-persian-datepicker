@@ -54,15 +54,18 @@ class ReactComponent extends React.Component<Props> {
   }
 
   public componentDidUpdate(prevProps: Props): void {
-    const { defaultValue } = this.props;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { defaultValue, inputProps, customRender, ...restProps } = this.props;
 
     if (
-      prevProps.defaultValue === defaultValue ||
-      typeof defaultValue === "boolean"
+      defaultValue &&
+      prevProps.defaultValue === defaultValue &&
+      typeof defaultValue !== "boolean"
     ) {
-      return;
+      this.instance?.setDate(defaultValue, false);
     }
-    this.instance?.setDate(defaultValue, false);
+
+    this.instance?.setOptions({ ...restProps });
   }
 
   public componentWillUnmount(): void {

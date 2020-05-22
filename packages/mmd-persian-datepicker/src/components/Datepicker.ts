@@ -221,21 +221,15 @@ class PrivateDatepicker {
       this.calendarElem.appendChild(monthWrapper);
     }
 
-    if (!this.isOpen) {
-      if (inline) {
-        this.elem.appendChild(this.calendarElem);
-      } else {
-        this.wrapperElem.appendChild(this.calendarElem);
-        document.body.appendChild(this.wrapperElem);
-      }
+    if (inline && this.elem.children.length === 0) {
+      this.elem.appendChild(this.calendarElem);
+    } else if (!inline && this.wrapperElem.children.length === 0) {
+      this.wrapperElem.appendChild(this.calendarElem);
+      document.body.appendChild(this.wrapperElem);
     }
 
     this.handleDaysState();
     this.elem.addEventListener("click", this.open);
-
-    if (inline && !this.isOpen) {
-      this.isOpen = true;
-    }
   };
 
   private createMonthWrapper = (): HTMLElement => {

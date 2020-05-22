@@ -91,9 +91,11 @@ class PrivateDatepicker {
         .map((item) => getValidatedMoment(item, this.options.format))
         .filter((item) => (item === null ? false : true)) as Array<Moment>;
 
-      this.currentMonth = momented[0].jMonth();
-      this.currentYear = momented[0].jYear();
-      this.setValue(defaultValue);
+      if (momented.length > 0) {
+        this.currentMonth = momented[0].jMonth();
+        this.currentYear = momented[0].jYear();
+        this.setValue(defaultValue);
+      }
     } else if (defaultValue) {
       const momentedDefaultValue = this.getMomented(
         moment(
@@ -175,22 +177,25 @@ class PrivateDatepicker {
   private createElement = (): void => {
     const { classNames, numberOfMonths, inline } = this.options;
 
-    const id = this.elem.getAttribute("id");
+    if (!this.calendarElem.getAttribute("id")) {
+      const id = this.elem.getAttribute("id");
 
-    if (id) {
-      this.calendarElem.setAttribute(
-        "id",
-        `${this.elem.getAttribute("id")}-calendar`
-      );
+      if (id) {
+        this.calendarElem.setAttribute(
+          "id",
+          `${this.elem.getAttribute("id")}-calendar`
+        );
+      }
     }
 
-    const dir = document.dir;
-
-    this.wrapperElem.classList.add(this.options.classNames.wrapperClassName);
-    this.calendarElem.classList.add(classNames.baseClassName);
-    this.calendarElem.classList.add(
-      dir === "rtl" ? classNames.rtlClassName : classNames.ltrClassName
-    );
+    if (!this.isOpen) {
+      const dir = document.dir;
+      this.wrapperElem.classList.add(this.options.classNames.wrapperClassName);
+      this.calendarElem.classList.add(classNames.baseClassName);
+      this.calendarElem.classList.add(
+        dir === "rtl" ? classNames.rtlClassName : classNames.ltrClassName
+      );
+    }
 
     if (inline) {
       this.calendarElem.classList.add(classNames.inlineClassName);
@@ -199,7 +204,7 @@ class PrivateDatepicker {
 
     // remove any previous data in calendar elem
     while (this.calendarElem.firstChild) {
-      this.calendarElem.removeChild(this.calendarElem.firstChild);
+      this.calendarElem.firstChild.remove();
     }
 
     // create arrows
@@ -216,15 +221,21 @@ class PrivateDatepicker {
       this.calendarElem.appendChild(monthWrapper);
     }
 
-    if (inline) {
-      this.elem.appendChild(this.calendarElem);
-    } else {
-      this.wrapperElem.appendChild(this.calendarElem);
-      document.body.appendChild(this.wrapperElem);
+    if (!this.isOpen) {
+      if (inline) {
+        this.elem.appendChild(this.calendarElem);
+      } else {
+        this.wrapperElem.appendChild(this.calendarElem);
+        document.body.appendChild(this.wrapperElem);
+      }
     }
 
     this.handleDaysState();
     this.elem.addEventListener("click", this.open);
+
+    if (inline && !this.isOpen) {
+      this.isOpen = true;
+    }
   };
 
   private createMonthWrapper = (): HTMLElement => {
@@ -352,17 +363,21 @@ class PrivateDatepicker {
 
   private goNextMonth = (): void => {
     this.currentMonth = this.currentMonth !== 11 ? this.currentMonth + 1 : 0;
+
     if (this.currentMonth === 0) {
       this.currentYear += 1;
     }
+
     this.createElement();
   };
 
   private goPrevMonth = (): void => {
     this.currentMonth = this.currentMonth !== 0 ? this.currentMonth - 1 : 11;
+
     if (this.currentMonth === 11) {
       this.currentYear -= 1;
     }
+
     this.createElement();
   };
 
@@ -436,18 +451,25 @@ class PrivateDatepicker {
   };
 
   private addOpenClass = (): void => {
-    const { options } = this;
+    const { classNames } = this.options;
+
+    if (
+      this.calendarElem.classList.contains(`${classNames.baseClassName}--open`)
+    ) {
+      return;
+    }
+
     this.calendarElem.classList.add(
-      `${options.classNames.baseClassName}--open`,
-      `${options.classNames.baseClassName}--open-animated`
+      `${classNames.baseClassName}--open`,
+      `${classNames.baseClassName}--open-animated`
     );
   };
 
   private removeOpenClass = (): void => {
-    const { options } = this;
+    const { classNames } = this.options;
     this.calendarElem.classList.remove(
-      `${options.classNames.baseClassName}--open`,
-      `${options.classNames.baseClassName}--open-animated`
+      `${classNames.baseClassName}--open`,
+      `${classNames.baseClassName}--open-animated`
     );
   };
 
@@ -701,10 +723,13 @@ class PrivateDatepicker {
 
   public open = (): void => {
     if (this.isOpen) return;
+
     this.isOpen = true;
+
     if (!this.options.inline) {
       this.setPosition();
     }
+
     this.addOpenClass();
   };
 
@@ -761,7 +786,6 @@ class PrivateDatepicker {
       }
       this.setValue(momented, triggerChange);
       this.createElement();
-
       return;
     }
 

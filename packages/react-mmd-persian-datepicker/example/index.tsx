@@ -8,7 +8,7 @@ function CustomInput({ inputRef, ...props }: any) {
 
 function App(): JSX.Element {
   const [active, setActive] = useState(true);
-  const [date, setDate] = useState<any>();
+  const [date, setDate] = useState<any>([]);
 
   return (
     <div>

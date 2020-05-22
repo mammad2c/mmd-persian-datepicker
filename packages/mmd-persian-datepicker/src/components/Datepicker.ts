@@ -376,13 +376,15 @@ class PrivateDatepicker {
   };
 
   private onDayClick = (): void => {
-    const { onClick, autoClose } = this.options;
+    const { onClick, autoClose, mode } = this.options;
 
     if (typeof onClick === "function") {
       onClick(this.selectedDates, this.pickerPrivater);
     }
 
-    if (autoClose) {
+    if (autoClose && mode === "range" && this.selectedDates.length === 2) {
+      this.close();
+    } else if (autoClose && mode !== "range") {
       this.close();
     }
   };
@@ -732,11 +734,10 @@ class PrivateDatepicker {
 
     const { mode } = this.options;
 
-    if (mode === "range" && !this.selectedDates[1]) {
+    if (mode === "range" && this.selectedDates.length !== 2) {
       this.setValue();
       this.inRangeDates = [];
       this.tempMaxDate = undefined;
-      this.onDayClick();
       this.handleDaysState();
     }
 

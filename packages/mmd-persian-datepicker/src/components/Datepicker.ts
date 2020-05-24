@@ -222,7 +222,8 @@ class PrivateDatepicker {
     }
 
     if (inline && this.elem.children.length === 0) {
-      this.elem.appendChild(this.calendarElem);
+      this.wrapperElem.appendChild(this.calendarElem);
+      this.elem.appendChild(this.wrapperElem);
     } else if (!inline && this.wrapperElem.children.length === 0) {
       this.wrapperElem.appendChild(this.calendarElem);
       document.body.appendChild(this.wrapperElem);

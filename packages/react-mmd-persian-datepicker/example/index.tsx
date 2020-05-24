@@ -35,7 +35,7 @@ function App(): JSX.Element {
       {active && (
         <MmdPersianDatepicker
           mode="range"
-          autoClose
+          inline
           disabledDates={disabledDates}
           numberOfMonths={2}
           customRender={(inputProps, ref) => {

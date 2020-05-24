@@ -28,6 +28,7 @@ export interface IOptions<T> {
   format: string;
   disabledDates: disabledDates;
   inline: boolean;
+  highlightWeekends: boolean;
   classNames: {
     wrapperClassName: string;
     baseClassName: string;
@@ -53,6 +54,8 @@ export interface IOptions<T> {
     inRangeDayItemClassName: string;
     todayClassName: string;
     disabledDayItemClassName: string;
+    offsetDayItemClassName: string;
+    weekendDayItemClassName: string;
     // footer class name:
     footerClassName: string;
   };

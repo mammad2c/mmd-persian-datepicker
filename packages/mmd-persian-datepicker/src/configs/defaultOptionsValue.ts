@@ -16,6 +16,7 @@ export const defaultOptionsValue: IOptions<Datepicker> = {
   format: "jYYYY/jM/jD",
   disabledDates: [],
   inline: false,
+  highlightWeekends: true,
   classNames: {
     wrapperClassName: constants.wrapperClassName,
     baseClassName: constants.baseClassName,
@@ -41,6 +42,8 @@ export const defaultOptionsValue: IOptions<Datepicker> = {
     inRangeDayItemClassName: constants.inRangeDayItemClassName,
     todayClassName: constants.todayClassName,
     disabledDayItemClassName: constants.disabledDayItemClassName,
+    offsetDayItemClassName: constants.offsetDayItemClassName,
+    weekendDayItemClassName: constants.weekendDayItemClassName,
     // footer class name:
     footerClassName: constants.footerClassName,
   },

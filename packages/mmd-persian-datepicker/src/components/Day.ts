@@ -19,6 +19,7 @@ interface IDay {
   findInRangeDate: (dateValue: Moment | string) => Moment | undefined;
   handleDaysState: () => void;
   disabledDates: Array<Moment>;
+  highlightWeekends: boolean;
   setTempMaxDate: (value: Moment | undefined) => void;
 }
 
@@ -30,6 +31,7 @@ interface IDayUpdate {
   isDisabled?: IDay["isDisabled"];
   format: IDay["format"];
   multiple: IDay["multiple"];
+  highlightWeekends: IDay["highlightWeekends"];
   disabledDates: Array<Moment>;
 }
 
@@ -68,6 +70,8 @@ class Day {
 
   private disabledDates: IDay["disabledDates"];
 
+  private highlightWeekends: IDay["highlightWeekends"];
+
   private setTempMaxDate: IDay["setTempMaxDate"];
 
   constructor({
@@ -87,6 +91,7 @@ class Day {
     findInRangeDate,
     handleDaysState,
     disabledDates,
+    highlightWeekends,
     setTempMaxDate,
   }: IDay) {
     this.date = date;
@@ -107,6 +112,7 @@ class Day {
     this.isDisabled = isDisabled;
     this.handleDisable();
     this.disabledDates = disabledDates;
+    this.highlightWeekends = highlightWeekends;
     this.setTempMaxDate = setTempMaxDate;
   }
 
@@ -285,6 +291,12 @@ class Day {
       } else if (mode === "range" && !startDate) {
         dayElem.classList.remove(constants.inRangeDayItemClassName);
       }
+    }
+
+    if (this.highlightWeekends && date.day() === 5) {
+      dayElem.classList.add(constants.weekendDayItemClassName);
+    } else {
+      dayElem.classList.remove(constants.weekendDayItemClassName);
     }
   };
 

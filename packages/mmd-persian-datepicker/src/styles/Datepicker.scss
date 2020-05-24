@@ -144,20 +144,20 @@
   }
 
   &__day-item--selected {
-    background-color: $blue;
-    color: #fff;
+    background-color: $blue !important;
+    color: #fff !important;
 
     &:hover {
-      background-color: $blue;
-      color: #fff;
+      background-color: $blue !important;
+      color: #fff !important;
     }
   }
 
   &__day-item--in-range {
-    background-color: rgba($color: $blue, $alpha: 0.3);
+    background-color: rgba(135, 171, 251, 0.3);
 
     &:hover {
-      background-color: rgba($color: $blue, $alpha: 0.3);
+      background-color: rgba(135, 171, 251, 0.3);
     }
   }
 
@@ -170,5 +170,15 @@
       box-shadow: none !important;
       cursor: not-allowed !important;
     }
+  }
+
+  &__day-item--weekend {
+    color: $red;
+  }
+
+  &__day-item--offset {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    background-color: transparent !important;
   }
 }

@@ -314,7 +314,7 @@ class PrivateDatepicker {
     days.classList.add(options.classNames.daysClassName);
 
     for (let i = 0; i < offsetStartWeek; i += 1) {
-      days.innerHTML += `<span class="${options.classNames.dayItemClassName} ${options.classNames.disabledDayItemClassName}"></span>`;
+      days.innerHTML += `<span class="${options.classNames.dayItemClassName} ${options.classNames.offsetDayItemClassName}"></span>`;
     }
 
     const daysInCurrentMonth = this.calculateDaysInCurrentMonth(additional);
@@ -338,6 +338,7 @@ class PrivateDatepicker {
         handleDaysState: this.handleDaysState,
         disabledDates: this.disabledDates,
         setTempMaxDate: this.setTempMaxDate,
+        highlightWeekends: options.highlightWeekends,
       });
 
       days.appendChild(day.render());
@@ -407,6 +408,7 @@ class PrivateDatepicker {
         selectedDates: this.selectedDates,
         format: options.format,
         multiple: options.multiple,
+        highlightWeekends: options.highlightWeekends,
         disabledDates: this.disabledDates,
       });
     }

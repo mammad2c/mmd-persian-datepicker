@@ -765,7 +765,6 @@ class PrivateDatepicker {
     format?: string
   ): void => {
     const finalFormat = format || this.options.format;
-
     if (Array.isArray(dateValue)) {
       const momented = dateValue
         .map((item) => getValidatedMoment(item, finalFormat))

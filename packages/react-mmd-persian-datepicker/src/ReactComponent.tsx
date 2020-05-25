@@ -52,7 +52,6 @@ class ReactComponent extends React.Component<Props> {
   public componentDidMount(): void {
     this.createInstance();
   }
-
   public componentDidUpdate(prevProps: Props): void {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { defaultValue, inputProps, customRender, ...restProps } = this.props;
@@ -63,6 +62,14 @@ class ReactComponent extends React.Component<Props> {
       typeof defaultValue !== "boolean"
     ) {
       this.instance?.setDate(defaultValue, false);
+    } else if (
+      Object.prototype.hasOwnProperty.call(this.props, "defaultValue") &&
+      prevProps.defaultValue !== defaultValue &&
+      !defaultValue
+    ) {
+      if (defaultValue === false) {
+        this.instance?.setDate([], false);
+      }
     }
 
     this.instance?.setOptions({ ...restProps });

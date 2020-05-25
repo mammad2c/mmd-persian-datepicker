@@ -22,6 +22,8 @@ you have to installed [NodeJS v8](https://nodejs.org) up and recommended install
 - [moment js](https://github.com/moment/moment)
 - [moment jalaali](https://github.com/jalaali/moment-jalaali)
 
+**planing to migrate from moment to jalaali-js**
+
 ## Todo:
 
 - [ ] writing tests.

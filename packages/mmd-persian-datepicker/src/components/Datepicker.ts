@@ -195,15 +195,19 @@ class PrivateDatepicker {
 
     if (!this.isOpen) {
       const dir = document.dir;
-      this.wrapperElem.classList.add(this.options.classNames.wrapperClassName);
-      this.calendarElem.classList.add(classNames.baseClassName);
+      this.wrapperElem.classList.add(
+        this.options.classNames?.wrapperClassName || ""
+      );
+      this.calendarElem.classList.add(classNames?.baseClassName || "");
       this.calendarElem.classList.add(
-        dir === "rtl" ? classNames.rtlClassName : classNames.ltrClassName
+        dir === "rtl"
+          ? classNames?.rtlClassName || ""
+          : classNames?.ltrClassName || ""
       );
     }
 
     if (inline) {
-      this.wrapperElem.classList.add(classNames.inlineClassName);
+      this.wrapperElem.classList.add(classNames?.inlineClassName || "");
       this.addOpenClass();
     }
 
@@ -242,7 +246,7 @@ class PrivateDatepicker {
     const { options } = this;
     const monthWrapper = document.createElement("div");
 
-    monthWrapper.classList.add(options.classNames.monthWrapperClassName);
+    monthWrapper.classList.add(options.classNames?.monthWrapperClassName || "");
     return monthWrapper;
   };
 
@@ -255,14 +259,14 @@ class PrivateDatepicker {
     const arrowLeft = document.createElement("span");
 
     arrowRight.classList.add(
-      `${options.classNames.arrowsClassName}`,
-      `${options.classNames.arrowsRightClassName}`
+      `${options.classNames?.arrowsClassName}`,
+      `${options.classNames?.arrowsRightClassName}`
     );
     arrowRight.innerHTML = options.arrows.right;
 
     arrowLeft.classList.add(
-      `${options.classNames.arrowsClassName}`,
-      `${options.classNames.arrowsLeftClassName}`
+      `${options.classNames?.arrowsClassName}`,
+      `${options.classNames?.arrowsLeftClassName}`
     );
     arrowLeft.innerHTML = options.arrows.left;
 
@@ -286,13 +290,13 @@ class PrivateDatepicker {
 
     const year = monthOverflow ? currentYear + 1 : currentYear;
 
-    header.classList.add(classNames.headerClassName);
-    title.classList.add(classNames.titleClassName);
+    header.classList.add(classNames?.headerClassName || "");
+    title.classList.add(classNames?.titleClassName || "");
     title.innerHTML = `
-			<span class="${classNames.titleMonthClassName}">
+			<span class="${classNames?.titleMonthClassName}">
 			${monthName}
 			</span>
-			<span class="${classNames.titleYearClassName}">
+			<span class="${classNames?.titleYearClassName}">
 				${year}
 			</span>`;
 
@@ -315,11 +319,11 @@ class PrivateDatepicker {
     const month = monthOverflow ? 1 : currentMonth + additional + 1;
     const year = monthOverflow ? currentYear + 1 : currentYear;
 
-    body.classList.add(options.classNames.bodyClassName);
-    days.classList.add(options.classNames.daysClassName);
+    body.classList.add(options.classNames?.bodyClassName || "");
+    days.classList.add(options.classNames?.daysClassName || "");
 
     for (let i = 0; i < offsetStartWeek; i += 1) {
-      days.innerHTML += `<span class="${options.classNames.dayItemClassName} ${options.classNames.offsetDayItemClassName}"></span>`;
+      days.innerHTML += `<span class="${options.classNames?.dayItemClassName} ${options.classNames?.offsetDayItemClassName}"></span>`;
     }
 
     const daysInCurrentMonth = this.calculateDaysInCurrentMonth(additional);
@@ -350,10 +354,10 @@ class PrivateDatepicker {
       this.days.push(day);
     }
 
-    weeks.classList.add(options.classNames.weeksClassName);
+    weeks.classList.add(options.classNames?.weeksClassName || "");
 
     for (let i = 0; i < weekNames.length; i += 1) {
-      weeks.innerHTML += `<span class="${options.classNames.weekItemClassName}">${weekNames[i]}</span>`;
+      weeks.innerHTML += `<span class="${options.classNames?.weekItemClassName}">${weekNames[i]}</span>`;
     }
 
     body.appendChild(weeks);
@@ -458,22 +462,22 @@ class PrivateDatepicker {
     const { classNames } = this.options;
 
     if (
-      this.calendarElem.classList.contains(`${classNames.baseClassName}--open`)
+      this.calendarElem.classList.contains(`${classNames?.baseClassName}--open`)
     ) {
       return;
     }
 
     this.calendarElem.classList.add(
-      `${classNames.baseClassName}--open`,
-      `${classNames.baseClassName}--open-animated`
+      `${classNames?.baseClassName}--open`,
+      `${classNames?.baseClassName}--open-animated`
     );
   };
 
   private removeOpenClass = (): void => {
     const { classNames } = this.options;
     this.calendarElem.classList.remove(
-      `${classNames.baseClassName}--open`,
-      `${classNames.baseClassName}--open-animated`
+      `${classNames?.baseClassName}--open`,
+      `${classNames?.baseClassName}--open-animated`
     );
   };
 
@@ -814,7 +818,13 @@ class PrivateDatepicker {
   };
 
   public setOptions = (options: IOptions<Datepicker>): void => {
+    const classNames = Object.assign(
+      {},
+      this.options.classNames,
+      options?.classNames
+    );
     Object.assign(this.options, options);
+    this.options.classNames = { ...classNames };
     this.validateDisabledDates();
     this.handleDaysState();
   };

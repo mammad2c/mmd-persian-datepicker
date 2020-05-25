@@ -178,8 +178,11 @@
 .mmd-wrapper {
   position: absolute;
 
-  &--inline,
-  .mmd-picker {
+  &--inline {
     position: relative;
+
+    > .mmd-picker {
+      position: relative;
+    }
   }
 }

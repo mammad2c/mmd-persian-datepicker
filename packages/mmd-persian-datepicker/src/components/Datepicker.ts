@@ -71,6 +71,11 @@ class PrivateDatepicker {
     }
 
     this.options = Object.assign({}, defaultOptionsValue, options);
+    this.options.classNames = Object.assign(
+      {},
+      defaultOptionsValue.classNames,
+      options?.classNames
+    );
     this.pickerPrivater = pickerPrivater;
     this.wrapperElem = document.createElement("div");
     this.calendarElem = document.createElement("div");

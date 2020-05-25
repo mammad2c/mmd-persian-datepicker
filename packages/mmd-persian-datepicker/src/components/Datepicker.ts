@@ -198,7 +198,7 @@ class PrivateDatepicker {
     }
 
     if (inline) {
-      this.calendarElem.classList.add(classNames.inlineClassName);
+      this.wrapperElem.classList.add(classNames.inlineClassName);
       this.addOpenClass();
     }
 

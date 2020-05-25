@@ -1,7 +1,7 @@
 export enum constants {
   wrapperClassName = "mmd-wrapper",
+  inlineClassName = "mmd-wrapper--inline",
   baseClassName = "mmd-picker",
-  inlineClassName = "mmd-picker--inline",
   monthWrapperClassName = "mmd-picker__month-wrapper",
   rtlClassName = "mmd-picker--rtl",
   ltrClassName = "mmd-picker--ltr",

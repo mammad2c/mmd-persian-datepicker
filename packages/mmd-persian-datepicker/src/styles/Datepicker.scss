@@ -13,10 +13,6 @@
   }
 }
 
-.mmd-wrapper {
-  position: absolute;
-}
-
 .mmd-picker {
   position: absolute;
   transition: all 0.15s ease;
@@ -50,10 +46,6 @@
   &::-moz-selection,
   & *::-moz-selection {
     background: transparent;
-  }
-
-  &--inline {
-    position: relative;
   }
 
   &--open {
@@ -180,5 +172,14 @@
     opacity: 0 !important;
     visibility: hidden !important;
     background-color: transparent !important;
+  }
+}
+
+.mmd-wrapper {
+  position: absolute;
+
+  &--inline,
+  .mmd-picker {
+    position: relative;
   }
 }

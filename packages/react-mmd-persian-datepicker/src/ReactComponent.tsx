@@ -2,7 +2,7 @@ import React, { RefObject } from "react";
 import MmdPersianDatepicker, {
   defaultOptionsValue,
   IOptions,
-} from "mmd-persian-datepicker/src";
+} from "mmd-persian-datepicker";
 
 interface Props extends IOptions<MmdPersianDatepicker> {
   inputProps?: React.DetailedHTMLProps<

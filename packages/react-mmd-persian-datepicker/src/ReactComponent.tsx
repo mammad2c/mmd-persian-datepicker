@@ -58,8 +58,8 @@ class ReactComponent extends React.Component<Props> {
     const { defaultValue, inputProps, customRender, ...restProps } = this.props;
 
     if (
-      defaultValue &&
-      prevProps.defaultValue === defaultValue &&
+      Object.prototype.hasOwnProperty.call(this.props, "defaultValue") &&
+      prevProps.defaultValue !== defaultValue &&
       typeof defaultValue !== "boolean"
     ) {
       this.instance?.setDate(defaultValue, false);

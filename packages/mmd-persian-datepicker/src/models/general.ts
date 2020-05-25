@@ -63,7 +63,7 @@ export interface IOptions<T> {
     left: string;
     right: string;
   };
-  weekName: Array<string>;
+  weekNames: Array<string>;
   monthNames: Array<string>;
   // events:
   onClick?: (selectedDate: ISelectedDates, self: T) => void;

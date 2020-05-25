@@ -301,7 +301,7 @@ class PrivateDatepicker {
     const body = document.createElement("div");
     const days = document.createElement("div");
     const weeks = document.createElement("div");
-    const { weekName } = options;
+    const { weekNames } = options;
     const offsetStartWeek = parseInt(
       this.calculateFirstDayOfMonth(additional),
       10
@@ -347,8 +347,8 @@ class PrivateDatepicker {
 
     weeks.classList.add(options.classNames.weeksClassName);
 
-    for (let i = 0; i < weekName.length; i += 1) {
-      weeks.innerHTML += `<span class="${options.classNames.weekItemClassName}">${weekName[i]}</span>`;
+    for (let i = 0; i < weekNames.length; i += 1) {
+      weeks.innerHTML += `<span class="${options.classNames.weekItemClassName}">${weekNames[i]}</span>`;
     }
 
     body.appendChild(weeks);

@@ -12,3 +12,4 @@ compiled
 docs
 package-lock.json
 .cache
+.parcel-cache

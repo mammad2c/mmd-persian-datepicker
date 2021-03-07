@@ -8,7 +8,7 @@
   },
   "extends": [
     "eslint:recommended",
-    "prettier",
+    "plugin:prettier/recommended",
     "plugin:@typescript-eslint/recommended"
   ],
   "globals": {
@@ -25,7 +25,6 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
-  "plugins": ["prettier"],
   "rules": {
     "@typescript-eslint/interface-name-prefix": "off",
     "max-classes-per-file": "off",

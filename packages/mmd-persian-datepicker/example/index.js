@@ -1,6 +1,2 @@
-import MmdPersianDatepicker from "../src/components/Datepicker";
-new MmdPersianDatepicker("#div-picker", {
-  inline: true,
-  numberOfMonths: 2,
-});
+import MmdPersianDatepicker from "../dist/mmd-persian-datepicker.umd";
 new MmdPersianDatepicker("#input-picker", {});

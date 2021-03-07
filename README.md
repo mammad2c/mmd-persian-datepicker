@@ -28,6 +28,7 @@ you have to installed [NodeJS v8](https://nodejs.org) up and recommended install
 
 - [ ] writing tests.
 - [ ] modular codes.
+- [ ] migrate to `jalaali-js` and drop usage of `moment`.
 
 #### Configs:
 

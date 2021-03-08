@@ -7,6 +7,7 @@
     "strict": true,
     "sourceMap": true,
     "allowJs": true,
+    "esModuleInterop": true,
     "noImplicitAny": false,
     "declaration": true,
     "allowSyntheticDefaultImports": true,

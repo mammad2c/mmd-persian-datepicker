@@ -5,6 +5,6 @@
     "declarationDir": "dist/types",
     "outDir": "dist/lib"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "example"],
   "exclude": ["node_modules", "dist", ".cache"]
 }

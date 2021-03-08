@@ -1,4 +1,9 @@
-@mixin top-right-bottom-left($top: none, $right: none, $bottom: none, $left: none) {
+@mixin top-right-bottom-left(
+  $top: none,
+  $right: none,
+  $bottom: none,
+  $left: none
+) {
   @if ($top != none) {
     top: $top;
   }

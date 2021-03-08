@@ -2,29 +2,31 @@
  * this function inspired by jQuery siblings. return siblings of an element;
  * @param elem a html element to find its siblings;
  */
-const siblings = (elem: HTMLElement | undefined | null): [HTMLElement] | null => {
+const siblings = (
+  elem: HTMLElement | undefined | null
+): [HTMLElement] | null => {
   if (!elem) {
-    return null
+    return null;
   }
 
-  const matched: any = []
-  let tempN: any = elem
+  const matched: any = [];
+  let tempN: any = elem;
 
-  tempN = elem.previousSibling
+  tempN = elem.previousSibling;
   for (; tempN; tempN = tempN.previousSibling) {
     if (tempN.nodeType === 1) {
-      matched.push(tempN)
+      matched.push(tempN);
     }
   }
 
-  tempN = elem.nextSibling
+  tempN = elem.nextSibling;
   for (; tempN; tempN = tempN.nextSibling) {
     if (tempN.nodeType === 1) {
-      matched.push(tempN)
+      matched.push(tempN);
     }
   }
 
-  return matched
-}
+  return matched;
+};
 
-export { siblings }
+export { siblings };

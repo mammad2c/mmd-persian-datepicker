@@ -1,6 +1,6 @@
 {
   "name": "mmd-persian-datepicker",
-  "version": "0.1.107",
+  "version": "0.2.0",
   "description": "A pure js persian datepicker, powered by TypeScript :)",
   "keywords": [
     "datepicker",

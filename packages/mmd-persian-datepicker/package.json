@@ -12,8 +12,8 @@
     "jalali datepicker",
     "persian calendar"
   ],
-  "main": "dist/mmd-persian-datepicker.umd.js",
-  "typings": "dist/types/src",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "files": [
     "dist"
   ],

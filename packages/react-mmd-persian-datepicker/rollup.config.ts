@@ -16,7 +16,7 @@ const isProduction = process.env.NODE_ENV === "production";
 const extensions = [".js", ".jsx", ".ts", ".tsx"];
 
 export default {
-  input: `src/ReactComponent.tsx`,
+  input: `src/index.tsx`,
   output: [
     {
       file: pkg.main,

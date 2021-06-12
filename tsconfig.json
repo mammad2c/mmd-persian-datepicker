@@ -12,6 +12,7 @@
     "noImplicitAny": false,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "typeRoots": ["node_modules/@types"],

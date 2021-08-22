@@ -123,14 +123,8 @@ class Day {
       return;
     }
 
-    const {
-      date,
-      setValue,
-      mode,
-      onClick,
-      setInRangeDates,
-      disabledDates,
-    } = this;
+    const { date, setValue, mode, onClick, setInRangeDates, disabledDates } =
+      this;
 
     if (mode === "range") {
       setInRangeDates([date.clone().add(1, "d")]);

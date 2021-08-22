@@ -1,2 +1,2 @@
-import MmdPersianDatepicker from "../dist/mmd-persian-datepicker.umd";
+import MmdPersianDatepicker from "../dist/index";
 new MmdPersianDatepicker("#input-picker", {});

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import MmdPersianDatepicker from "../src/ReactComponent";
+import MmdPersianDatepicker from "../src";
 
 const CustomInput: React.FC<{
   inputRef: (node: React.RefObject<HTMLInputElement>) => void;

@@ -4,7 +4,7 @@ const path = require("path");
 const packageName = "package.json";
 
 const packages = [
-  path.resolve("package.json"),
+  path.resolve(packageName),
   path.resolve("packages", "mmd-persian-datepicker", packageName),
   path.resolve("packages", "react-mmd-persian-datepicker", packageName),
 ];

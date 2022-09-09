@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import MmdPersianDatepicker from "../src";
 
 const CustomInput: React.FC<{
@@ -9,7 +9,7 @@ const CustomInput: React.FC<{
 const App: React.FC = () => {
   const [active, setActive] = useState(true);
   const [date, setDate] = useState<any>([]);
-  const [disabledDates, setDisabledDates] = useState([]);
+  const [disabledDates, setDisabledDates] = useState<string[]>([]);
 
   return (
     <div>
@@ -52,4 +52,8 @@ const App: React.FC = () => {
 };
 
 const mountNode = document.getElementById("app");
-ReactDOM.render(<App />, mountNode);
+
+if (mountNode) {
+  const root = createRoot(mountNode);
+  root.render(<App />);
+}

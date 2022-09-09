@@ -29,7 +29,7 @@
   },
   "scripts": {
     "prebuild": "rimraf dist && rimraf .cache",
-    "build": "tsc --module commonjs && cross-env NODE_ENV=production rollup -c rollup.config.ts",
+    "build": "cross-env NODE_ENV=production rollup -c rollup.config.ts",
     "start": "yarn prebuild && rollup -c rollup.config.ts -w",
     "example": "parcel example/index.html",
     "prepublish": "yarn build",
@@ -67,12 +67,12 @@
     ]
   },
   "peerDependencies": {
-    "moment": "^2.29.1",
-    "moment-jalaali": "^0.9.4"
+    "moment": "^2.29.4",
+    "moment-jalaali": "^0.9.6"
   },
   "dependencies": {
-    "jalaali-js": "^1.2.3",
-    "moment": "^2.29.1",
-    "moment-jalaali": "^0.9.4"
+    "jalaali-js": "^1.2.6",
+    "moment": "^2.29.4",
+    "moment-jalaali": "^0.9.6"
   }
 }

@@ -29,7 +29,7 @@
   },
   "scripts": {
     "prebuild": "rimraf dist && rimraf .cache",
-    "build": "cross-env NODE_ENV=production rollup -c rollup.config.ts",
+    "build": "yarn prebuild && cross-env NODE_ENV=production rollup -c rollup.config.ts",
     "start": "yarn prebuild && rollup -c rollup.config.ts -w",
     "example": "parcel example/index.html",
     "prepublish": "yarn build",

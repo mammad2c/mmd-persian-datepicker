@@ -1,0 +1,70 @@
+{
+  "name": "converter-jalali-universal-datepicker",
+  "version": "0.2.1",
+  "description": "A converter for Jalali calendar. Convert jalali to georgian or vice versa",
+  "keywords": [
+    "datepicker",
+    "calendar",
+    "persian",
+    "jalali",
+    "farsi",
+    "persian datepicker",
+    "jalali datepicker",
+    "persian calendar"
+  ],
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "author": "Mohammad Toosi m_dd@rogers.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mammad2c/mmd-persian-datepicker",
+    "directory": "packages/converter-jalali-universal-datepicker"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "scripts": {
+    "prebuild": "rimraf dist && rimraf .cache",
+    "build": "yarn prebuild && cross-env NODE_ENV=production rollup -c rollup.config.ts",
+    "start": "yarn prebuild && rollup -c rollup.config.ts -w",
+    "example": "parcel example/index.html",
+    "test": "jest --coverage",
+    "prepublish": "yarn build",
+    "test:watch": "jest --coverage --watch",
+    "test:prod": "npm run lint && npm run test -- --no-cache",
+    "lint:js": "eslint --fix src/**/*.tsx",
+    "lint:styles": "stylelint --fix src/**/*.{css,scss,less,sass}"
+  },
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "ts-jest"
+    },
+    "testEnvironment": "jsdom",
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/test/"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 95,
+        "lines": 95,
+        "statements": 95
+      }
+    },
+    "collectCoverageFrom": [
+      "src/*.{js,ts,tsx}"
+    ]
+  },
+  "dependencies": {}
+}

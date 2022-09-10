@@ -67,7 +67,7 @@
     ]
   },
   "dependencies": {
-    "mmd-persian-datepicker": "^0.2.1",
+    "mmd-persian-datepicker": "*",
     "react": "18.2.0",
     "react-dom": "^18.2.0"
   }
